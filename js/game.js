@@ -4,12 +4,13 @@
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-const FRAME_DELAY = isMobile ? 12 : 8;
+// Ajustes para mobile
 const JUMP_SPEED = isMobile ? 0.012 : 0.015;
 const HORIZONTAL_EASING = isMobile ? 0.12 : 0.15;
 
-let lastFrameTime = 0;
-const ANIMATION_INTERVAL = 1000 / 15; // 15 frames por segundo
+// Controle de FPS da animação da águia (apenas os frames, não o movimento)
+let lastAnimationFrame = 0;
+const EAGLE_ANIMATION_DELAY = isMobile ? 120 : 80; // 120ms entre frames no mobile
 
 const SOUND_EFFECTS = {
     correct: 'sfx/CorrectAnswer.mp3',
@@ -19,6 +20,7 @@ const SOUND_EFFECTS = {
 };
 
 const PLATFORM_POSITIONS = [100, 250, 400];
+
 
 // ============================================
 // 2. GERAÇÃO AUTOMÁTICA DOS NÚMEROS
@@ -473,20 +475,18 @@ async function loadLeaderboard(gameMode) {
 }
 
 function showNameEntryModal(score, gameMode) {
-    console.log("🎯 showNameEntryModal CHAMADA! Score:", score, "GameMode:", gameMode);
+    console.log("🎯 Vitória! Score:", score, "GameMode:", gameMode);
     
-    // Remover modal existente
     const existingModal = document.querySelector('.name-entry-modal');
     if (existingModal) existingModal.remove();
     
-    // Criar o modal
     const modal = document.createElement('div');
     modal.className = 'name-entry-modal';
     modal.style.zIndex = '10000';
     modal.innerHTML = `
         <div class="name-entry-content">
-            <h3>🏆 NEW HIGH SCORE! 🏆</h3>
-            <p>You scored <strong style="color:#c9a13b; font-size:1.2rem;">${score}</strong> points in <strong>${getGameModeName(gameMode)}</strong></p>
+            <h3>🏆 YOU WIN! 🏆</h3>
+            <p>You scored <strong style="color:#c9a13b; font-size:1.5rem;">${score}</strong> points</p>
             <p>Enter your name for the global leaderboard:</p>
             <input type="text" id="player-name-input" class="name-input" placeholder="Your name" maxlength="20">
             <div class="name-entry-buttons">
@@ -497,28 +497,23 @@ function showNameEntryModal(score, gameMode) {
     `;
     
     document.body.appendChild(modal);
-    console.log("✅ Modal adicionado ao DOM");
     
-    // Focar no input
     setTimeout(() => {
         const nameInput = document.getElementById('player-name-input');
         if (nameInput) nameInput.focus();
     }, 100);
     
-    // Botão Submit
     const submitBtn = document.getElementById('submit-name-btn');
     if (submitBtn) {
         submitBtn.onclick = () => {
             const name = document.getElementById('player-name-input')?.value;
-            if (name && name.trim()) {
-                console.log("💾 Salvando no leaderboard:", name, score, gameMode);
-                saveToLeaderboard(gameMode, score, name);
-            }
+            const finalName = (name && name.trim()) ? name.trim() : "Anonymous";
+            console.log("💾 Salvando no leaderboard:", finalName, score, gameMode);
+            saveToLeaderboard(gameMode, score, finalName);
             modal.remove();
         };
     }
     
-    // Botão Skip
     const skipBtn = document.getElementById('skip-name-btn');
     if (skipBtn) {
         skipBtn.onclick = () => {
@@ -527,21 +522,20 @@ function showNameEntryModal(score, gameMode) {
         };
     }
     
-    // Enter key
     const nameInput = document.getElementById('player-name-input');
     if (nameInput) {
         nameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const name = e.target.value;
-                if (name && name.trim()) {
-                    console.log("💾 Salvando no leaderboard (Enter):", name, score, gameMode);
-                    saveToLeaderboard(gameMode, score, name);
-                }
+                const finalName = (name && name.trim()) ? name.trim() : "Anonymous";
+                console.log("💾 Salvando no leaderboard (Enter):", finalName, score, gameMode);
+                saveToLeaderboard(gameMode, score, finalName);
                 modal.remove();
             }
         });
     }
 }
+
 
 async function showLeaderboardModal() {
     const existingModal = document.querySelector('.leaderboard-modal');
@@ -647,15 +641,17 @@ if (leaderboardBtn) {
 }
 
 function animate() {
-    updateEagle();
-    drawEagle();
     requestAnimationFrame(animate);
+    
+    // Movimento da águia continua suave (sem limitação)
+    updateEagleMovement();
+    
+    // Desenha a águia a cada frame
+    drawEagle();
 }
 
-function updateEagle() {
-    const now = Date.now();
-    const deltaTime = now - lastFrameTime;
-    
+// Movimento da águia (suave, sem limitação)
+function updateEagleMovement() {
     if (isJumping) {
         jumpProgress += JUMP_SPEED;
         if (jumpProgress >= 1) {
@@ -670,25 +666,36 @@ function updateEagle() {
             if (currentAnimation !== 'flap') startAnimation('flap');
         }
     }
-    
-    if (isAnimating && deltaTime >= ANIMATION_INTERVAL) {
-        lastFrameTime = now;
-        animationFrame++;
+}
+
+// Atualização dos frames da animação (limitada para economizar CPU)
+function updateEagleAnimationFrames() {
+    const now = Date.now();
+    if (now - lastAnimationFrame >= EAGLE_ANIMATION_DELAY) {
+        lastAnimationFrame = now;
         
-        if (currentAnimation === 'flap' && animationFrame >= eagleImages.flap.length) {
-            animationFrame = 0;
-        }
-        else if (currentAnimation === 'celebrate' && animationFrame >= eagleImages.celebrate.length) {
-            stopAnimation();
-            if (!isJumping && gameActive && answered) nextRound();
-        }
-        else if (currentAnimation === 'wrong' && animationFrame >= eagleImages.wrong.length) {
-            stopAnimation();
+        if (isAnimating) {
+            animationFrame++;
+            
+            if (currentAnimation === 'flap' && animationFrame >= eagleImages.flap.length) {
+                animationFrame = 0;
+            }
+            else if (currentAnimation === 'celebrate' && animationFrame >= eagleImages.celebrate.length) {
+                stopAnimation();
+                if (!isJumping && gameActive && answered) nextRound();
+            }
+            else if (currentAnimation === 'wrong' && animationFrame >= eagleImages.wrong.length) {
+                stopAnimation();
+            }
         }
     }
 }
 
+// Chamar updateAnimationFrames dentro do drawEagle ou no animate
 function drawEagle() {
+    // Atualizar frames da animação (limitado)
+    updateEagleAnimationFrames();
+    
     DOM.ctx.clearRect(0, 0, 500, 250);
     
     let img = eagleImages.idle;
@@ -707,6 +714,7 @@ function drawEagle() {
         DOM.ctx.restore();
     }
 }
+
 
 function startAnimation(type) { currentAnimation = type; animationFrame = 0; frameCounter = 0; isAnimating = true; }
 function stopAnimation() { currentAnimation = 'idle'; animationFrame = 0; isAnimating = false; }
@@ -759,7 +767,7 @@ function startTimer() {
                 DOM.timer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
         }
-    }, 100);
+    }, 200);
 }
 
 function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } endTime = currentTime; }
@@ -837,12 +845,6 @@ function winGame() {
     const bonusPoints = Math.round(score * (bonus - 1));
     const finalScore = score + bonusPoints;
     
-    console.log("=== WIN GAME DEBUG ===");
-    console.log("currentGame:", currentGame);
-    console.log("finalScore:", finalScore);
-    console.log("highScores:", highScores);
-    console.log("highScores[currentGame]:", highScores[currentGame]);
-    
     gameActive = false;
     gameEnded = true;
     stopTimer();
@@ -850,28 +852,14 @@ function winGame() {
     
     DOM.platforms.forEach(p => p.disabled = true);
     
-    // Verificar se o highScores[currentGame] existe
-    const currentHighScore = highScores[currentGame] || 0;
-    console.log("Comparando:", finalScore, ">", currentHighScore);
-    
-    if (finalScore > currentHighScore) {
-        console.log("🏆 É novo recorde! Chamando showNameEntryModal...");
-        highScores[currentGame] = finalScore;
-        
-        if (window.currentUser && !window.isGuest) {
-            saveUserScoresToFirebase();
-        }
-        
-        // Pequeno delay para garantir que a tela de vitória não atrapalhe
-        setTimeout(() => {
-            showNameEntryModal(finalScore, currentGame);
-        }, 500);
-    } else {
-        console.log("❌ Não é novo recorde");
-    }
+    // SEMPRE mostra o modal para salvar a pontuação (qualquer vitória)
+    setTimeout(() => {
+        showNameEntryModal(finalScore, currentGame);
+    }, 500);
     
     showWinWithBonus();
 }
+
 
 function loseLife() { if (lives > 0) { lives--; updateLives(); if (lives === 0) gameOver(); } }
 
