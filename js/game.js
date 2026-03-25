@@ -2,15 +2,15 @@
 // 1. CONFIGURAÇÕES GLOBAIS
 // ============================================
 
-// Detectar dispositivo móvel
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-// Ajustes de performance
 const FRAME_DELAY = isMobile ? 12 : 8;
 const JUMP_SPEED = isMobile ? 0.012 : 0.015;
 const HORIZONTAL_EASING = isMobile ? 0.12 : 0.15;
 
-// Constantes do jogo
+let lastFrameTime = 0;
+const ANIMATION_INTERVAL = 1000 / 15; // 15 frames por segundo
+
 const SOUND_EFFECTS = {
     correct: 'sfx/CorrectAnswer.mp3',
     wrong: 'sfx/IncorrectAnswer.mp3',
@@ -48,18 +48,14 @@ function generateNumbers_101_999() {
     
     for (let h = 0; h < hundreds.length; h++) {
         const hundredWord = `${hundreds[h]} hundred`;
-        
-        // Centenas redondas (100, 200, 300...)
         numbers.push({ value: (h + 1) * 100, word: hundredWord });
         
-        // 101-109 (one hundred one, one hundred two...)
         for (let u = 0; u < units.length; u++) {
             const value = (h + 1) * 100 + (u + 1);
             const word = `${hundredWord} ${units[u]}`;
             numbers.push({ value, word });
         }
         
-        // 110-119 (one hundred ten, one hundred eleven...)
         for (let s = 0; s < 10; s++) {
             const specials = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 
                               'sixteen', 'seventeen', 'eighteen', 'nineteen'];
@@ -68,17 +64,14 @@ function generateNumbers_101_999() {
             numbers.push({ value, word });
         }
         
-        // 120-199 (one hundred twenty, one hundred twenty-one, etc.)
         for (let t = 0; t < tensList.length; t++) {
             const tenWord = tensList[t];
             const tenValue = (t + 1) * 10;
             
-            // Dezenas redondas (120, 130, 140...)
             const valueTen = (h + 1) * 100 + tenValue;
             const wordTen = `${hundredWord} ${tenWord}`;
             numbers.push({ value: valueTen, word: wordTen });
             
-            // Dezenas + unidades (121, 122...)
             for (let u = 0; u < units.length; u++) {
                 const value = (h + 1) * 100 + tenValue + (u + 1);
                 const word = `${hundredWord} ${tenWord}-${units[u]}`;
@@ -87,7 +80,6 @@ function generateNumbers_101_999() {
         }
     }
     
-    // Remover duplicatas (se houver)
     const unique = [];
     const seen = new Set();
     for (const num of numbers) {
@@ -96,7 +88,6 @@ function generateNumbers_101_999() {
             unique.push(num);
         }
     }
-    
     return unique;
 }
 
@@ -104,38 +95,89 @@ function generateNumbers_1001_9999() {
     const numbers = [];
     const thousands = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     const hundreds = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-    const tensList = ['ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    const tensList = ['twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
     const units = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 
+                   'sixteen', 'seventeen', 'eighteen', 'nineteen'];
     
     for (let th = 0; th < thousands.length; th++) {
-        const thousandValue = (th + 1) * 1000;
+        const thousandWord = `${thousands[th]} thousand`;
+        numbers.push({ value: (th + 1) * 1000, word: thousandWord });
+        
+        for (let u = 0; u < units.length; u++) {
+            const value = (th + 1) * 1000 + (u + 1);
+            const word = `${thousandWord} ${units[u]}`;
+            numbers.push({ value, word });
+        }
+        
+        for (let s = 0; s < teens.length; s++) {
+            const value = (th + 1) * 1000 + 10 + s;
+            const word = `${thousandWord} ${teens[s]}`;
+            numbers.push({ value, word });
+        }
+        
+        for (let t = 0; t < tensList.length; t++) {
+            const tenWord = tensList[t];
+            const tenValue = (t + 2) * 10;
+            
+            const valueDezenaRedonda = (th + 1) * 1000 + tenValue;
+            const wordDezenaRedonda = `${thousandWord} ${tenWord}`;
+            numbers.push({ value: valueDezenaRedonda, word: wordDezenaRedonda });
+            
+            for (let u = 0; u < units.length; u++) {
+                const value = (th + 1) * 1000 + tenValue + (u + 1);
+                const word = `${thousandWord} ${tenWord}-${units[u]}`;
+                numbers.push({ value, word });
+            }
+        }
         
         for (let h = 0; h < hundreds.length; h++) {
+            const hundredWord = `${hundreds[h]} hundred`;
             const hundredValue = (h + 1) * 100;
             
+            const valueCentenaRedonda = (th + 1) * 1000 + hundredValue;
+            const wordCentenaRedonda = `${thousandWord} ${hundredWord}`;
+            numbers.push({ value: valueCentenaRedonda, word: wordCentenaRedonda });
+            
+            for (let u = 0; u < units.length; u++) {
+                const value = (th + 1) * 1000 + hundredValue + (u + 1);
+                const word = `${thousandWord} ${hundredWord} ${units[u]}`;
+                numbers.push({ value, word });
+            }
+            
+            for (let s = 0; s < teens.length; s++) {
+                const value = (th + 1) * 1000 + hundredValue + 10 + s;
+                const word = `${thousandWord} ${hundredWord} ${teens[s]}`;
+                numbers.push({ value, word });
+            }
+            
             for (let t = 0; t < tensList.length; t++) {
-                const tenValue = (t + 1) * 10;
+                const tenWord = tensList[t];
+                const tenValue = (t + 2) * 10;
+                
+                const valueDezenaRedonda = (th + 1) * 1000 + hundredValue + tenValue;
+                const wordDezenaRedonda = `${thousandWord} ${hundredWord} ${tenWord}`;
+                numbers.push({ value: valueDezenaRedonda, word: wordDezenaRedonda });
                 
                 for (let u = 0; u < units.length; u++) {
-                    // pular milhares redondos
-                    if (hundredValue === 100 && tenValue === 10 && u === 0) continue;
-                    
-                    const value = thousandValue + hundredValue + tenValue + (u + 1);
-                    let word = `${thousands[th]} thousand`;
-                    
-                    if (hundredValue > 0) word += ` ${hundreds[h]} hundred`;
-                    if (tenValue > 0 && u + 1 > 0) word += ` ${tensList[t]}-${units[u]}`;
-                    else if (tenValue > 0) word += ` ${tensList[t]}`;
-                    else if (u + 1 > 0) word += ` ${units[u]}`;
-                    
+                    const value = (th + 1) * 1000 + hundredValue + tenValue + (u + 1);
+                    const word = `${thousandWord} ${hundredWord} ${tenWord}-${units[u]}`;
                     numbers.push({ value, word });
                 }
             }
         }
     }
-    return numbers;
+    
+    const unique = [];
+    const seen = new Set();
+    for (const num of numbers) {
+        if (!seen.has(num.value)) {
+            seen.add(num.value);
+            unique.push(num);
+        }
+    }
+    return unique;
 }
-
 
 // ============================================
 // 3. GAME DATA
@@ -171,25 +213,16 @@ const gameData = {
         { value: 900, word: 'nine hundred' }, { value: 1000, word: 'one thousand' }
     ],
     
-    // 🟢 NOVOS MODOS
     random21_99: generateNumbers_21_99(),
     random101_999: generateNumbers_101_999(),
     random1001_9999: generateNumbers_1001_9999(),
     mixedAdvanced: []
-
 };
-
-
 
 function generateMixedAdvanced() {
     const categories = [
-        gameData.random21_99,
-        gameData.random101_999,
-        gameData.random1001_9999,
-        gameData.numbers,
-        gameData.numbers11_20,
-        gameData.tens,
-        gameData.hundreds
+        gameData.random21_99, gameData.random101_999, gameData.random1001_9999,
+        gameData.numbers, gameData.numbers11_20, gameData.tens, gameData.hundreds
     ];
     
     const mixed = [];
@@ -209,8 +242,7 @@ function generateMixedAdvanced() {
     return mixed;
 }
 
-    gameData.mixedAdvanced = generateMixedAdvanced();
-
+gameData.mixedAdvanced = generateMixedAdvanced();
 
 // ============================================
 // 4. VARIÁVEIS DE ESTADO
@@ -221,14 +253,14 @@ let currentNumbers = [];
 let currentNumber = null;
 let score = 0;
 let highScores = {
-    numbers: localStorage.getItem('highScore_numbers') ? parseInt(localStorage.getItem('highScore_numbers')) : 0,
-    numbers11_20: localStorage.getItem('highScore_numbers11_20') ? parseInt(localStorage.getItem('highScore_numbers11_20')) : 0,
-    tens: localStorage.getItem('highScore_tens') ? parseInt(localStorage.getItem('highScore_tens')) : 0,
-    hundreds: localStorage.getItem('highScore_hundreds') ? parseInt(localStorage.getItem('highScore_hundreds')) : 0,
-    random21_99: localStorage.getItem('highScore_random21_99') ? parseInt(localStorage.getItem('highScore_random21_99')) : 0,
-    random101_999: localStorage.getItem('highScore_random101_999') ? parseInt(localStorage.getItem('highScore_random101_999')) : 0,
-    random1001_9999: localStorage.getItem('highScore_random1001_9999') ? parseInt(localStorage.getItem('highScore_random1001_9999')) : 0,
-    mixedAdvanced: localStorage.getItem('highScore_mixedAdvanced') ? parseInt(localStorage.getItem('highScore_mixedAdvanced')) : 0
+    numbers: 0,
+    numbers11_20: 0,
+    tens: 0,
+    hundreds: 0,
+    random21_99: 0,
+    random101_999: 0,
+    random1001_9999: 0,
+    mixedAdvanced: 0
 };
 
 let lives = 3, streak = 0, multiplier = 1, answered = false, availableNumbers = [];
@@ -319,11 +351,280 @@ function loadImages() {
 }
 
 // ============================================
-// 9. FUNÇÕES PRINCIPAIS
+// 9. FUNÇÕES DE SCORE COM FIREBASE
+// ============================================
+
+function saveUserScoresToFirebase() {
+    if (!window.currentUser || window.isGuest) return;
+    
+    const userScores = {
+        numbers: highScores.numbers,
+        numbers11_20: highScores.numbers11_20,
+        tens: highScores.tens,
+        hundreds: highScores.hundreds,
+        random21_99: highScores.random21_99,
+        random101_999: highScores.random101_999,
+        random1001_9999: highScores.random1001_9999,
+        mixedAdvanced: highScores.mixedAdvanced,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    db.collection('users').doc(window.currentUser.uid).collection('scores').doc('highScores').set(userScores)
+        .then(() => console.log("✅ Scores saved to Firebase"))
+        .catch(err => console.error("❌ Error saving scores:", err));
+}
+
+function loadUserScoresFromFirebase() {
+    return new Promise((resolve, reject) => {
+        if (!window.currentUser || window.isGuest) {
+            resolve();
+            return;
+        }
+        
+        console.log("📥 Loading scores from Firebase for user:", window.currentUser.uid);
+        
+        db.collection('users').doc(window.currentUser.uid).collection('scores').doc('highScores').get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    highScores = {
+                        numbers: data.numbers || 0,
+                        numbers11_20: data.numbers11_20 || 0,
+                        tens: data.tens || 0,
+                        hundreds: data.hundreds || 0,
+                        random21_99: data.random21_99 || 0,
+                        random101_999: data.random101_999 || 0,
+                        random1001_9999: data.random1001_9999 || 0,
+                        mixedAdvanced: data.mixedAdvanced || 0
+                    };
+                    console.log("✅ Scores loaded from Firebase:", highScores);
+                } else {
+                    console.log("🆕 New user - scores are ZERO");
+                }
+                
+                if (DOM.highScore) DOM.highScore.textContent = highScores[currentGame] || 0;
+                resolve();
+            })
+            .catch(err => {
+                console.error("❌ Error loading scores:", err);
+                reject(err);
+            });
+    });
+}
+
+// ============================================
+// 10. FUNÇÕES DO LEADERBOARD
+// ============================================
+
+function getGameModeName(gameMode) {
+    const names = {
+        'numbers': 'Numbers 1-10',
+        'numbers11-20': 'Numbers 11-20',
+        'tens': 'Tens',
+        'hundreds': 'Hundreds',
+        'random21_99': '21-99',
+        'random101_999': '101-999',
+        'random1001_9999': '1,001-9,999',
+        'mixedAdvanced': 'Mixed Advanced'
+    };
+    return names[gameMode] || gameMode;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function saveToLeaderboard(gameMode, score, playerName) {
+    if (!playerName || playerName.trim() === "") return;
+    
+    const leaderboardRef = db.collection('leaderboards').doc(gameMode).collection('scores');
+    
+    leaderboardRef.add({
+        name: playerName.trim(),
+        score: score,
+        date: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        console.log(`✅ Score ${score} saved to ${gameMode} leaderboard`);
+    }).catch(err => {
+        console.error("❌ Error saving to leaderboard:", err);
+    });
+}
+
+async function loadLeaderboard(gameMode) {
+    const leaderboardRef = db.collection('leaderboards').doc(gameMode).collection('scores');
+    
+    try {
+        const snapshot = await leaderboardRef
+            .orderBy('score', 'desc')
+            .limit(20)
+            .get();
+        
+        const scores = [];
+        snapshot.forEach(doc => {
+            scores.push(doc.data());
+        });
+        return scores;
+    } catch (err) {
+        console.error("❌ Error loading leaderboard:", err);
+        return [];
+    }
+}
+
+function showNameEntryModal(score, gameMode) {
+    console.log("🎯 showNameEntryModal CHAMADA! Score:", score, "GameMode:", gameMode);
+    
+    // Remover modal existente
+    const existingModal = document.querySelector('.name-entry-modal');
+    if (existingModal) existingModal.remove();
+    
+    // Criar o modal
+    const modal = document.createElement('div');
+    modal.className = 'name-entry-modal';
+    modal.style.zIndex = '10000';
+    modal.innerHTML = `
+        <div class="name-entry-content">
+            <h3>🏆 NEW HIGH SCORE! 🏆</h3>
+            <p>You scored <strong style="color:#c9a13b; font-size:1.2rem;">${score}</strong> points in <strong>${getGameModeName(gameMode)}</strong></p>
+            <p>Enter your name for the global leaderboard:</p>
+            <input type="text" id="player-name-input" class="name-input" placeholder="Your name" maxlength="20">
+            <div class="name-entry-buttons">
+                <button id="submit-name-btn" class="name-entry-btn submit">SUBMIT</button>
+                <button id="skip-name-btn" class="name-entry-btn skip">SKIP</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    console.log("✅ Modal adicionado ao DOM");
+    
+    // Focar no input
+    setTimeout(() => {
+        const nameInput = document.getElementById('player-name-input');
+        if (nameInput) nameInput.focus();
+    }, 100);
+    
+    // Botão Submit
+    const submitBtn = document.getElementById('submit-name-btn');
+    if (submitBtn) {
+        submitBtn.onclick = () => {
+            const name = document.getElementById('player-name-input')?.value;
+            if (name && name.trim()) {
+                console.log("💾 Salvando no leaderboard:", name, score, gameMode);
+                saveToLeaderboard(gameMode, score, name);
+            }
+            modal.remove();
+        };
+    }
+    
+    // Botão Skip
+    const skipBtn = document.getElementById('skip-name-btn');
+    if (skipBtn) {
+        skipBtn.onclick = () => {
+            console.log("Usuário pulou o leaderboard");
+            modal.remove();
+        };
+    }
+    
+    // Enter key
+    const nameInput = document.getElementById('player-name-input');
+    if (nameInput) {
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const name = e.target.value;
+                if (name && name.trim()) {
+                    console.log("💾 Salvando no leaderboard (Enter):", name, score, gameMode);
+                    saveToLeaderboard(gameMode, score, name);
+                }
+                modal.remove();
+            }
+        });
+    }
+}
+
+async function showLeaderboardModal() {
+    const existingModal = document.querySelector('.leaderboard-modal');
+    if (existingModal) existingModal.remove();
+    
+    const modal = document.createElement('div');
+    modal.className = 'leaderboard-modal';
+    modal.innerHTML = `
+        <div class="leaderboard-content">
+            <div class="leaderboard-header">
+                <h2>🏆 GLOBAL LEADERBOARDS</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="leaderboard-tabs" id="leaderboard-tabs"></div>
+            <div id="leaderboard-list" class="leaderboard-list">
+                <div class="leaderboard-empty">Loading...</div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const gameModes = [
+        { id: 'numbers', name: '1-10' },
+        { id: 'numbers11-20', name: '11-20' },
+        { id: 'tens', name: 'Tens' },
+        { id: 'hundreds', name: '100s' },
+        { id: 'random21_99', name: '21-99' },
+        { id: 'random101_999', name: '101-999' },
+        { id: 'random1001_9999', name: '1K-9K' },
+        { id: 'mixedAdvanced', name: 'Mixed' }
+    ];
+    
+    const tabsContainer = document.getElementById('leaderboard-tabs');
+    gameModes.forEach((mode, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (index === 0 ? ' active' : '');
+        btn.textContent = mode.name;
+        btn.dataset.mode = mode.id;
+        btn.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadLeaderboardForMode(mode.id);
+        };
+        tabsContainer.appendChild(btn);
+    });
+    
+    async function loadLeaderboardForMode(modeId) {
+        const listContainer = document.getElementById('leaderboard-list');
+        listContainer.innerHTML = '<div class="leaderboard-empty">Loading...</div>';
+        
+        const scores = await loadLeaderboard(modeId);
+        
+        if (scores.length === 0) {
+            listContainer.innerHTML = '<div class="leaderboard-empty">No scores yet. Be the first!</div>';
+            return;
+        }
+        
+        listContainer.innerHTML = '';
+        scores.forEach((score, index) => {
+            const item = document.createElement('div');
+            item.className = 'leaderboard-item';
+            item.innerHTML = `
+                <div class="leaderboard-rank">${index + 1}º</div>
+                <div class="leaderboard-name">${escapeHtml(score.name)}</div>
+                <div class="leaderboard-score">${score.score}</div>
+            `;
+            listContainer.appendChild(item);
+        });
+    }
+    
+    await loadLeaderboardForMode('numbers');
+    
+    modal.querySelector('.close-modal').onclick = () => modal.remove();
+}
+
+// ============================================
+// 11. FUNÇÕES PRINCIPAIS DO JOGO
 // ============================================
 
 function initGame() {
     console.log('Game starting...');
+    
     DOM.canvas.width = 500;
     DOM.canvas.height = 250;
     loadImages();
@@ -333,6 +634,14 @@ function initGame() {
     DOM.speakerToggle?.addEventListener('click', toggleAudio);
     DOM.startButton?.addEventListener('click', startGame);
     DOM.platforms.forEach(p => p.addEventListener('click', handlePlatformClick));
+    
+  const leaderboardBtn = document.getElementById('global-rankings-btn');
+if (leaderboardBtn) {
+    leaderboardBtn.addEventListener('click', () => {
+        console.log("Botão Rankings clicado!");
+        showLeaderboardModal(); // sua função que abre o modal
+    });
+}
     
     animate();
 }
@@ -344,6 +653,9 @@ function animate() {
 }
 
 function updateEagle() {
+    const now = Date.now();
+    const deltaTime = now - lastFrameTime;
+    
     if (isJumping) {
         jumpProgress += JUMP_SPEED;
         if (jumpProgress >= 1) {
@@ -359,18 +671,19 @@ function updateEagle() {
         }
     }
     
-    if (isAnimating) {
-        frameCounter++;
-        if (frameCounter >= FRAME_DELAY) {
-            frameCounter = 0;
-            animationFrame++;
-            
-            if (currentAnimation === 'flap' && animationFrame >= eagleImages.flap.length) animationFrame = 0;
-            else if (currentAnimation === 'celebrate' && animationFrame >= eagleImages.celebrate.length) {
-                stopAnimation();
-                if (!isJumping && gameActive && answered) nextRound();
-            }
-            else if (currentAnimation === 'wrong' && animationFrame >= eagleImages.wrong.length) stopAnimation();
+    if (isAnimating && deltaTime >= ANIMATION_INTERVAL) {
+        lastFrameTime = now;
+        animationFrame++;
+        
+        if (currentAnimation === 'flap' && animationFrame >= eagleImages.flap.length) {
+            animationFrame = 0;
+        }
+        else if (currentAnimation === 'celebrate' && animationFrame >= eagleImages.celebrate.length) {
+            stopAnimation();
+            if (!isJumping && gameActive && answered) nextRound();
+        }
+        else if (currentAnimation === 'wrong' && animationFrame >= eagleImages.wrong.length) {
+            stopAnimation();
         }
     }
 }
@@ -432,7 +745,7 @@ function handlePlatformClick(e) {
 }
 
 // ============================================
-// 10. GAME FLOW FUNCTIONS
+// 12. GAME FLOW FUNCTIONS
 // ============================================
 
 function startTimer() {
@@ -466,8 +779,27 @@ function updateLives() {
 function updateHighScore() {
     if (score > highScores[currentGame]) {
         highScores[currentGame] = score;
-        localStorage.setItem(`highScore_${currentGame}`, score);
+        
+        if (window.currentUser && !window.isGuest) {
+            saveUserScoresToFirebase();
+        }
+        
         if (DOM.highScore) DOM.highScore.textContent = score;
+        
+        const msg = document.createElement('div');
+        msg.textContent = '🏆 NEW HIGH SCORE!';
+        msg.style.position = 'fixed';
+        msg.style.top = '50%';
+        msg.style.left = '50%';
+        msg.style.transform = 'translate(-50%, -50%)';
+        msg.style.background = '#c9a13b';
+        msg.style.color = '#1e3c5c';
+        msg.style.padding = '1rem 2rem';
+        msg.style.borderRadius = '50px';
+        msg.style.fontWeight = 'bold';
+        msg.style.zIndex = '1000';
+        document.body.appendChild(msg);
+        setTimeout(() => msg.remove(), 2000);
     }
 }
 
@@ -477,17 +809,11 @@ function playAudio() {
     if (!currentNumber || isAudioMuted || !gameActive) return;
     if (audioPlayer) { audioPlayer.pause(); audioPlayer.currentTime = 0; }
     
-    // Converter o texto para o formato do arquivo
-    // Exemplo: "nine thousand nine hundred two" → "nine_thousand_nine_hundred_two"
-    let nomeArquivo = currentNumber.word
-        .replace(/ /g, "_")           // espaços viram underscores
-        .replace(/-/g, "_")           // hífens viram underscores
-        .toLowerCase();               // tudo minúsculo
-    
+    let nomeArquivo = currentNumber.word.toLowerCase();
+    console.log(`🔊 Tocando: ${nomeArquivo}.mp3`);
     audioPlayer.src = `audio/${nomeArquivo}.mp3`;
     
     audioPlayer.play().catch(() => {
-        // Fallback: se não encontrar o áudio, usa voz do navegador
         if ('speechSynthesis' in window) {
             let utter = new SpeechSynthesisUtterance(currentNumber.word);
             utter.lang = 'en-US';
@@ -506,9 +832,44 @@ function gameOver() {
 
 function winGame() {
     if (gameEnded) return;
-    gameActive = false; gameEnded = true; stopTimer();
+    
+    const bonus = calculateSpeedBonus();
+    const bonusPoints = Math.round(score * (bonus - 1));
+    const finalScore = score + bonusPoints;
+    
+    console.log("=== WIN GAME DEBUG ===");
+    console.log("currentGame:", currentGame);
+    console.log("finalScore:", finalScore);
+    console.log("highScores:", highScores);
+    console.log("highScores[currentGame]:", highScores[currentGame]);
+    
+    gameActive = false;
+    gameEnded = true;
+    stopTimer();
     playSound('win');
+    
     DOM.platforms.forEach(p => p.disabled = true);
+    
+    // Verificar se o highScores[currentGame] existe
+    const currentHighScore = highScores[currentGame] || 0;
+    console.log("Comparando:", finalScore, ">", currentHighScore);
+    
+    if (finalScore > currentHighScore) {
+        console.log("🏆 É novo recorde! Chamando showNameEntryModal...");
+        highScores[currentGame] = finalScore;
+        
+        if (window.currentUser && !window.isGuest) {
+            saveUserScoresToFirebase();
+        }
+        
+        // Pequeno delay para garantir que a tela de vitória não atrapalhe
+        setTimeout(() => {
+            showNameEntryModal(finalScore, currentGame);
+        }, 500);
+    } else {
+        console.log("❌ Não é novo recorde");
+    }
+    
     showWinWithBonus();
 }
 
@@ -530,16 +891,10 @@ function nextRound() {
 }
 
 function setupPlatforms() {
-    // O número correto é currentNumber.value
     const correctValue = currentNumber.value;
-    
-    // Opções: começa com o número correto
     let options = [correctValue];
-    
-    // Pegar valores possíveis do jogo atual
     let possibleValues = currentNumbers.map(n => n.value);
     
-    // Adicionar 2 números aleatórios diferentes do correto
     while (options.length < 3) {
         const randomIndex = Math.floor(Math.random() * possibleValues.length);
         const randomValue = possibleValues[randomIndex];
@@ -548,26 +903,15 @@ function setupPlatforms() {
         }
     }
     
-    // Embaralhar as opções
     for (let i = options.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [options[i], options[j]] = [options[j], options[i]];
     }
     
-    // Atualizar os botões
     DOM.platforms.forEach((p, i) => {
         p.textContent = options[i];
         p.dataset.value = options[i];
     });
-    
-    // Verificar se o número correto está nas opções (debug)
-    const hasCorrect = [...DOM.platforms].some(p => parseInt(p.dataset.value) === correctValue);
-    if (!hasCorrect) {
-        console.error("ERRO: Número correto não está nas opções!", correctValue);
-        // Forçar correção
-        DOM.platforms[0].textContent = correctValue;
-        DOM.platforms[0].dataset.value = correctValue;
-    }
 }
 
 function calculateSpeedBonus() { return endTime <= 0 ? 1 : Math.min(5, Math.max(1, Math.round(5 * (15 / endTime) * 100) / 100)); }
@@ -605,6 +949,7 @@ function showWinWithBonus() {
         highScores[currentGame] = total;
         localStorage.setItem(`highScore_${currentGame}`, total);
         DOM.highScore.textContent = total;
+        if (window.currentUser && !window.isGuest) saveUserScoresToFirebase();
     }
     
     DOM.game.appendChild(winScreen);
@@ -640,10 +985,28 @@ function toggleAudio() {
 }
 
 function resetGame() {
-    availableNumbers = [...currentNumbers];
-    score = 0; lives = 3; streak = 0; multiplier = 1; gameEnded = false; answered = false;
-    updateScore(); updateMultiplier(); updateLives();
-    removeRestartButton(); removeWinScreen(); resetEagle();
+    const shuffled = [...currentNumbers];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    availableNumbers = shuffled.slice(0, 10);
+    
+    score = 0;
+    lives = 3;
+    streak = 0;
+    multiplier = 1;
+    gameEnded = false;
+    answered = false;
+    
+    updateScore();
+    updateMultiplier();
+    updateLives();
+    
+    removeRestartButton();
+    removeWinScreen();
+    resetEagle();
+    
     nextRound();
 }
 
@@ -658,7 +1021,7 @@ function startGame() {
 }
 
 // ============================================
-// 11. SELEÇÃO DE JOGO (COM NOVOS MODOS)
+// 13. SELEÇÃO DE JOGO
 // ============================================
 
 window.selectGame = function(gameType) {
@@ -688,7 +1051,10 @@ window.selectGame = function(gameType) {
     };
     
     currentNumbers = modeMap[gameType] || gameData.numbers;
-    DOM.highScore.textContent = highScores[gameType] || 0;
+    
+    const currentHighScore = highScores[gameType] || 0;
+    DOM.highScore.textContent = currentHighScore;
+    console.log(`📊 High score for ${gameType}: ${currentHighScore}`);
     
     gameActive = false;
     stopTimer();
@@ -709,7 +1075,57 @@ window.selectGame = function(gameType) {
 };
 
 // ============================================
-// 12. START
+// 14. INICIAR O JOGO (AGUARDANDO FIREBASE)
 // ============================================
 
-window.addEventListener('load', initGame);
+let authInitialized = false;
+
+function startGameAfterAuth() {
+    if (authInitialized) return;
+    authInitialized = true;
+    
+    console.log("Firebase ready, checking user...");
+    
+    firebase.auth().onAuthStateChanged((user) => {
+        console.log("Auth state changed:", user ? user.email : "No user");
+        
+        highScores = {
+            numbers: 0,
+            numbers11_20: 0,
+            tens: 0,
+            hundreds: 0,
+            random21_99: 0,
+            random101_999: 0,
+            random1001_9999: 0,
+            mixedAdvanced: 0
+        };
+        
+        if (user) {
+            window.currentUser = user;
+            window.isGuest = false;
+            console.log(`👤 User logged in: ${user.uid}`);
+            
+            loadUserScoresFromFirebase().then(() => {
+                console.log("Scores loaded, starting game...");
+                initGame();
+            }).catch(() => {
+                initGame();
+            });
+        } else {
+            window.currentUser = null;
+            window.isGuest = false;
+            console.log("👤 No user logged in");
+            initGame();
+        }
+    });
+}
+
+if (typeof firebase !== 'undefined') {
+    startGameAfterAuth();
+} else {
+    window.addEventListener('load', () => {
+        if (typeof firebase !== 'undefined') {
+            startGameAfterAuth();
+        }
+    });
+}

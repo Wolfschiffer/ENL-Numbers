@@ -3,123 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>English Next Level - Games</title>
+  <title>ENL Numbers - English Next Level</title>
   <link rel="stylesheet" href="css/style.css">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-  <!-- MENU CONTAINER -->
-  <div class="game-container" id="menu-container">
-    <div class="header">
-      <div class="title-section">
-        <h1>ENGLISH <span class="highlight">NEXT LEVEL</span></h1>
-        <p class="subtitle">learning games</p>
-      </div>
+<!-- TELA DE LOGIN/REGISTRO -->
+<div id="auth-container" class="game-container auth-container" style="max-width: 400px;">
+    <div class="auth-header">
+        <div class="title-section">
+            <h1>ENGLISH <span class="highlight">NEXT LEVEL</span></h1>
+            <p class="subtitle">sign in to save your progress</p>
+        </div>
     </div>
     
-    <div class="menu-content">
-      <div class="eagle-menu-icon">🦅</div>
-      <h2 class="menu-title">Choose a Game</h2>
-      
-      <div class="game-cards">
-        <!-- EASY -->
-        <div class="game-card" onclick="selectGame('numbers')">
-          <div class="card-icon">🔢</div>
-          <h3>Numbers 1-10</h3>
-          <p>one, two, three...</p>
-          <span class="card-badge easy">Easy</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <!-- MEDIUM -->
-        <div class="game-card" onclick="selectGame('numbers11-20')">
-          <div class="card-icon">🔢🔟</div>
-          <h3>Numbers 11-20</h3>
-          <p>eleven, twelve...</p>
-          <span class="card-badge medium">Medium</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectGame('tens')">
-          <div class="card-icon">💯</div>
-          <h3>Tens</h3>
-          <p>twenty, thirty, forty...</p>
-          <span class="card-badge medium">Medium</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectGame('random21_99')">
-          <div class="card-icon">🎲</div>
-          <h3>21 - 99</h3>
-          <p>twenty-one, thirty-two...</p>
-          <span class="card-badge medium">Medium</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <!-- HARD -->
-        <div class="game-card" onclick="selectGame('hundreds')">
-          <div class="card-icon">🏛️</div>
-          <h3>Hundreds</h3>
-          <p>one hundred, two hundred...</p>
-          <span class="card-badge hard">Hard</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectGame('random101_999')">
-          <div class="card-icon">🎲🏛️</div>
-          <h3>101 - 999</h3>
-          <p>one hundred one, two hundred thirty...</p>
-          <span class="card-badge hard">Hard</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <!-- EXPERT -->
-        <div class="game-card" onclick="selectGame('random1001_9999')">
-          <div class="card-icon">🎲💯</div>
-          <h3>1,001 - 9,999</h3>
-          <p>one thousand one, five thousand two hundred...</p>
-          <span class="card-badge expert">Expert</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectGame('mixedAdvanced')">
-          <div class="card-icon">🃏</div>
-          <h3>Mixed Advanced</h3>
-          <p>21, 357, 4,821...</p>
-          <span class="card-badge expert">Expert</span>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-      </div>
-      
-      <div class="menu-footer">
+    <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Login</button>
+        <button class="auth-tab" data-tab="register">Register</button>
+    </div>
+    
+    <div id="login-form" class="auth-form active">
+        <input type="email" id="login-email" placeholder="Email" class="auth-input">
+        <input type="password" id="login-password" placeholder="Password" class="auth-input">
+        <button id="login-btn" class="auth-btn">Login</button>
+    </div>
+    
+    <div id="register-form" class="auth-form">
+        <input type="text" id="register-name" placeholder="Your Name" class="auth-input">
+        <input type="email" id="register-email" placeholder="Email" class="auth-input">
+        <input type="password" id="register-password" placeholder="Password (min 6 chars)" class="auth-input">
+        <button id="register-btn" class="auth-btn">Register</button>
+    </div>
+    
+    <div class="guest-option">
+        <button id="guest-btn" class="guest-btn">Play as Guest</button>
+    </div>
+    
+    <div class="auth-footer">
         <p>📘 from the ebook <strong>"English Next Level"</strong> by Mylena Machado</p>
-      </div>
     </div>
-  </div>
+</div>
 
-  <!-- GAME CONTAINER -->
-  <div class="game-container" id="game-container" style="display: none;">
+<!-- MENU CONTAINER -->
+<div class="game-container" id="menu-container" style="display: none;">
     <div class="header">
-      <div class="title-section">
-        <h1>ENGLISH <span class="highlight">NEXT LEVEL</span></h1>
-        <p class="subtitle" id="game-subtitle">numbers edition</p>
-      </div>
-      <div class="header-buttons">
-        <button id="menu-button" class="menu-btn">🏠</button>
-        <button id="speaker-toggle" class="speaker-btn">🔊</button>
-      </div>
+        <div class="title-section">
+            <h1>ENGLISH <span class="highlight">NEXT LEVEL</span></h1>
+            <p class="subtitle">learning games</p>
+        </div>
+        <div class="user-info" id="user-info" style="display: none;">
+            <span id="user-name-display" class="user-name"></span>
+            <button id="logout-btn" class="logout-btn">🚪</button>
+        </div>
     </div>
     
+ <div class="leaderboard-card" style="margin: 20px auto; max-width: 160px;">
+    <button id="global-rankings-btn" class="game-card" style="width: 100%; text-align: center; padding: 12px 15px; display: flex; flex-direction: column; align-items: center; gap: 6px; background: #f8fafc; border: 3px solid #c9a13b; border-radius: 20px; cursor: pointer; font-family: inherit;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: #1e3c5c; letter-spacing: 1px;">GLOBAL</span>
+        <span style="font-size: 3.5rem;">🏆</span>
+        <span style="font-size: 0.85rem; font-weight: 700; color: #1e3c5c;">LEADERBOARDS</span>
+    </button>
+</div>
+
+
+
+    <div class="menu-content">
+        <div class="eagle-menu-icon">🦅</div>
+        <h2 class="menu-title">Choose a Game</h2>
+        
+        <div class="game-cards">
+            <div class="game-card" onclick="selectGame('numbers')">
+                <div class="card-icon">🔢</div>
+                <h3>Numbers 1-10</h3>
+                <p>one, two, three...</p>
+                <span class="card-badge easy">Easy</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+            
+            <div class="game-card" onclick="selectGame('numbers11-20')">
+                <div class="card-icon">🔢🔟</div>
+                <h3>Numbers 11-20</h3>
+                <p>eleven, twelve...</p>
+                <span class="card-badge medium">Medium</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+            
+            <div class="game-card" onclick="selectGame('tens')">
+                <div class="card-icon">💯</div>
+                <h3>Tens</h3>
+                <p>twenty, thirty, forty...</p>
+                <span class="card-badge medium">Medium</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+            
+            <div class="game-card" onclick="selectGame('random21_99')">
+                <div class="card-icon">🎲</div>
+                <h3>21 - 99</h3>
+                <p>twenty-one, thirty-two...</p>
+                <span class="card-badge medium">Medium</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+            
+            <div class="game-card" onclick="selectGame('hundreds')">
+                <div class="card-icon">🏛️</div>
+                <h3>Hundreds</h3>
+                <p>one hundred, two hundred...</p>
+                <span class="card-badge hard">Hard</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+            
+            <div class="game-card" onclick="selectGame('random101_999')">
+                <div class="card-icon">🎲🏛️</div>
+                <h3>101 - 999</h3>
+                <p>one hundred one, two hundred thirty...</p>
+                <span class="card-badge hard">Hard</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+            
+            <div class="game-card" onclick="selectGame('random1001_9999')">
+                <div class="card-icon">🎲💯</div>
+                <h3>1,001 - 9,999</h3>
+                <p>one thousand one, five thousand two hundred...</p>
+                <span class="card-badge expert">Expert</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+            
+            <div class="game-card" onclick="selectGame('mixedAdvanced')">
+                <div class="card-icon">🃏</div>
+                <h3>Mixed Advanced</h3>
+                <p>21, 357, 4,821...</p>
+                <span class="card-badge expert">Expert</span>
+                <div class="best-score">Best: <span class="best-score-value">0</span></div>
+            </div>
+        </div>
+        
+        <div class="menu-footer">
+            <p>📘 from the ebook <strong>"English Next Level"</strong> by Mylena Machado</p>
+        </div>
+    </div>
+</div>
+
+<!-- GAME CONTAINER -->
+<div class="game-container" id="game-container" style="display: none;">
+    <div class="header">
+        <div class="title-section">
+            <h1>ENGLISH <span class="highlight">NEXT LEVEL</span></h1>
+            <p class="subtitle" id="game-subtitle">numbers edition</p>
+        </div>
+        <div class="header-buttons">
+            <button id="menu-button" class="menu-btn">🏠</button>
+            <button id="speaker-toggle" class="speaker-btn">🔊</button>
+        </div>
+    </div>
+    
+
     <div class="instructions" id="main-instructions">
-      👆 Click START to begin
+        👆 Click START to begin
     </div>
 
     <canvas id="stickman-canvas" width="500" height="250"></canvas>
 
     <div class="platforms" id="game-platforms">
-      <button class="platform" data-index="0">?</button>
-      <button class="platform" data-index="1">?</button>
-      <button class="platform" data-index="2">?</button>
+        <button class="platform" data-index="0">?</button>
+        <button class="platform" data-index="1">?</button>
+        <button class="platform" data-index="2">?</button>
     </div>
 
     <div id="wordDisplay" class="word-box">Ready?</div>
@@ -127,29 +178,30 @@
     <button id="start-game-btn" class="start-btn">START GAME</button>
 
     <div class="stats" id="game-stats" style="display: none;">
-      <div class="score-container">
-        <p>Points: <span id="score">0</span></p>
-        <p class="high-score">🏆 High Score: <span id="highScore">0</span></p>
-      </div>
-      <div class="timer-box">
-        <span>Time</span>
-        <div id="timer" class="timer-display">00:00</div>
-      </div>
-      <div class="multiplier-box">
-        <span>Multiplier</span>
-        <div id="multiplier" class="multiplier-display">1x</div>
-      </div>
-      <div class="lives-box">
-        <span>Lives</span>
-        <div id="lives" class="lives-display"></div>
-      </div>
+        <div class="score-container">
+            <p>Points: <span id="score">0</span></p>
+            <p class="high-score">🏆 High Score: <span id="highScore">0</span></p>
+        </div>
+        <div class="timer-box">
+            <span>Time</span>
+            <div id="timer" class="timer-display">00:00</div>
+        </div>
+        <div class="multiplier-box">
+            <span>Multiplier</span>
+            <div id="multiplier" class="multiplier-display">1x</div>
+        </div>
+        <div class="lives-box">
+            <span>Lives</span>
+            <div id="lives" class="lives-display"></div>
+        </div>
     </div>
 
     <div class="ebook-credit" id="game-credit">
-      <p>📘 from the ebook <strong>"English Next Level"</strong> by Mylena Machado</p>
+        <p>📘 from the ebook <strong>"English Next Level"</strong> by Mylena Machado</p>
     </div>
-  </div>
+</div>
 
-  <script src="js/game.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/game.js"></script>
 </body>
 </html>

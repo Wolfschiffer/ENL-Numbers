@@ -1,213 +1,210 @@
 /* ============================================ */
-/* 1. RESET BÁSICO - Remove estilos padrão do navegador */
+/* 1. RESET BÁSICO */
 /* ============================================ */
 * {
-  margin: 0;           /* Remove margens padrão */
-  padding: 0;          /* Remove espaçamentos internos */
-  box-sizing: border-box; /* Faz com que padding e border não aumentem o tamanho dos elementos */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* ============================================ */
 /* 2. FUNDO DA PÁGINA */
 /* ============================================ */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte bonita e moderna */
-  background: linear-gradient(135deg, #1e3c5c 0%, #2b5a84 100%); /* Gradiente: azul escuro → azul médio */
-  min-height: 100vh;            /* Altura mínima = tela inteira */
-  display: flex;                /* Usa flexbox para centralizar */
-  justify-content: center;      /* Centraliza horizontalmente */
-  align-items: center;          /* Centraliza verticalmente */
-  padding: 20px;                /* Espaçamento nas bordas */
-  position: relative;           /* Para posicionar a águia de fundo */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e3c5c 0%, #2b5a84 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
 }
 
-/* Águia de fundo (watermark) */
 body::before {
-  content: '';                  /* Cria um elemento vazio */
-  position: absolute;           /* Posiciona em relação ao body */
-  top: 0; left: 0;              /* Começa no canto superior esquerdo */
-  width: 100%; height: 100%;    /* Ocupa toda a tela */
-  background-image: url('../images/eagle-transparent.png'); /* Imagem da águia */
-  background-repeat: no-repeat; /* Não repete a imagem */
-  background-position: center;  /* Centraliza */
-  background-size: 140% auto;   /* Tamanho grande para cobrir bem */
-  opacity: 0.08;                /* Bem transparente (8%) */
-  pointer-events: none;         /* Não atrapalha cliques */
-  z-index: 0;                   /* Fica atrás de tudo */
-  filter: blur(0.5px);          /* Levemente desfocada para suavizar */
-  mix-blend-mode: soft-light;   /* Mistura suave com o fundo */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../images/eagle-transparent.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 140% auto;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(0.5px);
+  mix-blend-mode: soft-light;
 }
 
-/* Todo conteúdo fica acima da águia de fundo */
 body > * {
   position: relative;
   z-index: 1;
 }
 
 /* ============================================ */
-/* 3. CONTAINERS PRINCIPAIS (Menu e Jogo) */
+/* 3. CONTAINERS PRINCIPAIS */
 /* ============================================ */
 .game-container {
-  background: white;            /* Fundo branco */
-  border-radius: 20px;          /* Cantos arredondados */
-  padding: 20px;                /* Espaçamento interno */
-  border: 3px solid #c9a13b;    /* Borda dourada */
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3); /* Sombra para destacar */
-  width: 100%;                  /* Largura total disponível */
-  margin: 0 auto;               /* Centraliza */
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  width: 100%;
+  margin: 0 auto;
 }
 
 #menu-container {
-  max-width: 800px;             /* Menu mais largo */
+  max-width: 800px;
 }
 
 #game-container {
-  max-width: 600px;             /* Jogo um pouco menor */
+  max-width: 600px;
 }
 
 /* ============================================ */
-/* 4. CABEÇALHO (Título e Botões) */
+/* 4. CABEÇALHO */
 /* ============================================ */
 .header {
-  display: flex;                /* Alinha itens em linha */
-  justify-content: space-between; /* Espaço entre título e botões */
-  align-items: center;          /* Centraliza verticalmente */
-  margin-bottom: 15px;          /* Espaço embaixo */
-  padding-bottom: 10px;         /* Espaço interno embaixo */
-  border-bottom: 2px solid #eef2f6; /* Linha separadora clara */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eef2f6;
 }
 
 .title-section h1 {
-  color: #1e3c5c;               /* Azul escuro */
-  font-size: 24px;              /* Tamanho da fonte */
-  line-height: 1.2;             /* Altura da linha */
+  color: #1e3c5c;
+  font-size: 24px;
+  line-height: 1.2;
 }
 
 .title-section .highlight {
-  color: #c9a13b;               /* Dourado para destaque */
-  font-size: 28px;              /* Um pouco maior */
-  font-weight: 800;             /* Negrito forte */
-  display: block;               /* Quebra linha */
+  color: #c9a13b;
+  font-size: 28px;
+  font-weight: 800;
+  display: block;
 }
 
 .title-section .subtitle {
-  color: #7f8c8d;               /* Cinza suave */
-  font-size: 12px;              /* Pequeno */
-  text-transform: uppercase;    /* Tudo maiúsculo */
-  letter-spacing: 1px;          /* Espaço entre letras */
-  margin-top: 5px;              /* Espaço em cima */
+  color: #7f8c8d;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
 }
 
-/* Botões do cabeçalho (menu e som) */
 .header-buttons {
   display: flex;
-  gap: 8px;                     /* Espaço entre os botões */
+  gap: 8px;
 }
 
 .menu-btn, .speaker-btn {
-  width: 40px;                  /* Largura */
-  height: 40px;                 /* Altura */
-  border: 2px solid #c9a13b;    /* Borda dourada */
-  border-radius: 50%;           /* Formato circular */
-  background: none;             /* Fundo transparente */
-  font-size: 18px;              /* Tamanho do ícone */
-  cursor: pointer;              /* Mãozinha ao passar */
-  color: #c9a13b;               /* Cor dourada */
+  width: 40px;
+  height: 40px;
+  border: 2px solid #c9a13b;
+  border-radius: 50%;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #c9a13b;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;    /* Animação suave */
+  transition: all 0.3s ease;
 }
 
 .menu-btn:hover, .speaker-btn:hover {
-  background: #f8f4ec;          /* Fundo claro ao passar */
-  transform: scale(1.1);        /* Aumenta um pouco */
+  background: #f8f4ec;
+  transform: scale(1.1);
 }
 
-/* Botão de som quando mutado */
 .speaker-btn.muted {
-  background: #fee2e2;          /* Fundo vermelho claro */
-  border-color: #ef4444;        /* Borda vermelha */
-  color: #ef4444;               /* Ícone vermelho */
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 /* ============================================ */
-/* 5. INSTRUÇÕES DO JOGO */
+/* 5. INSTRUÇÕES */
 /* ============================================ */
 .instructions {
-  background: #f8fafc;          /* Fundo cinza claro */
-  padding: 10px;                /* Espaçamento interno */
-  border-radius: 8px;           /* Cantos arredondados */
-  margin: 15px 0;               /* Margem em cima e embaixo */
-  border: 1px solid #d1d9e6;    /* Borda suave */
-  color: #1e3c5c;               /* Texto azul escuro */
-  font-weight: 500;             /* Médio negrito */
-  text-align: center;           /* Centralizado */
-  font-size: 14px;              /* Tamanho da fonte */
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #d1d9e6;
+  color: #1e3c5c;
+  font-weight: 500;
+  text-align: center;
+  font-size: 14px;
 }
 
 /* ============================================ */
-/* 6. CANVAS (Onde a águia desenha) */
+/* 6. CANVAS */
 /* ============================================ */
 #stickman-canvas {
-  width: 100%;                  /* Largura responsiva */
-  height: auto;                 /* Altura automática */
-  max-width: 500px;             /* Largura máxima */
-  background: #f8fafc;          /* Fundo cinza claro */
-  border: 2px solid #c9a13b;    /* Borda dourada */
-  border-radius: 10px;          /* Cantos arredondados */
-  margin: 0 auto 15px;          /* Centraliza e dá espaço embaixo */
-  display: block;               /* Comportamento de bloco */
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+  background: #f8fafc;
+  border: 2px solid #c9a13b;
+  border-radius: 10px;
+  margin: 0 auto 15px;
+  display: block;
 }
 
 /* ============================================ */
-/* 7. PLATAFORMAS (Botões com números) */
+/* 7. PLATAFORMAS */
 /* ============================================ */
 .platforms {
-  display: grid;                /* Layout em grade */
-  grid-template-columns: repeat(3, 1fr); /* 3 colunas iguais */
-  gap: 15px;                    /* Espaço entre os botões */
-  margin: 15px 0;               /* Margem em cima e embaixo */
-  max-width: 500px;             /* Largura máxima */
-  margin-left: auto;            /* Centraliza */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 15px 0;
+  max-width: 500px;
+  margin-left: auto;
   margin-right: auto;
 }
 
 .platform {
-  aspect-ratio: 1;              /* Mantém proporção quadrada */
-  background: #f8fafc;          /* Fundo claro */
-  border: 3px solid #c9a13b;    /* Borda dourada */
-  border-radius: 15px;          /* Cantos arredondados */
-  font-size: 32px;              /* Números grandes */
-  font-weight: bold;            /* Negrito */
-  color: #1e3c5c;               /* Azul escuro */
+  aspect-ratio: 1;
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 15px;
+  font-size: 32px;
+  font-weight: bold;
+  color: #1e3c5c;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;              /* Mãozinha */
-  transition: all 0.3s ease;    /* Animação suave */
-  min-height: 60px;             /* Altura mínima para toque no celular */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 60px;
 }
 
 .platform:hover {
-  background: white;            /* Fundo branco ao passar */
-  transform: scale(1.02);       /* Aumenta um pouco */
+  background: white;
+  transform: scale(1.02);
 }
 
 .platform.correct {
-  background: #dcfce7;          /* Verde claro para acerto */
-  border-color: #22c55e;        /* Borda verde */
-  color: #166534;               /* Texto verde escuro */
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
 }
 
 .platform.wrong {
-  background: #fee2e2;          /* Vermelho claro para erro */
-  border-color: #ef4444;        /* Borda vermelha */
-  color: #991b1b;               /* Texto vermelho escuro */
-  animation: shake 0.3s;        /* Animação de tremor */
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+  animation: shake 0.3s;
 }
 
-/* Animação de tremor para resposta errada */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
@@ -215,20 +212,20 @@ body > * {
 }
 
 /* ============================================ */
-/* 8. PALAVRA QUE APARECE (ex: "five") */
+/* 8. WORD BOX */
 /* ============================================ */
 .word-box {
-  background: #f8fafc;          /* Fundo claro */
-  padding: 15px;                /* Espaçamento interno */
-  border-radius: 10px;          /* Cantos arredondados */
-  margin: 15px 0;               /* Margem */
-  border: 2px solid #c9a13b;    /* Borda dourada */
-  font-size: 32px;              /* Texto grande */
-  font-weight: bold;            /* Negrito */
-  color: #1e3c5c;               /* Azul escuro */
-  text-align: center;           /* Centralizado */
-  text-transform: capitalize;   /* Primeira letra maiúscula */
-  min-height: 80px;             /* Altura mínima */
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  border: 2px solid #c9a13b;
+  font-size: 32px;
+  font-weight: bold;
+  color: #1e3c5c;
+  text-align: center;
+  text-transform: capitalize;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -238,27 +235,27 @@ body > * {
 }
 
 /* ============================================ */
-/* 9. BOTÕES PRINCIPAIS (START, PLAY AGAIN) */
+/* 9. BOTÕES PRINCIPAIS */
 /* ============================================ */
 .start-btn {
-  background: #f8fafc;          /* Fundo claro */
-  border: 3px solid #c9a13b;    /* Borda dourada */
-  border-radius: 15px;          /* Cantos arredondados */
-  padding: 12px 20px;           /* Espaçamento interno */
-  font-size: 28px;              /* Texto grande */
-  font-weight: bold;            /* Negrito */
-  color: #1e3c5c;               /* Azul escuro */
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 15px;
+  padding: 12px 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1e3c5c;
   cursor: pointer;
-  width: 100%;                  /* Largura total */
-  max-width: 300px;             /* Largura máxima */
-  margin: 15px auto;            /* Centraliza */
+  width: 100%;
+  max-width: 300px;
+  margin: 15px auto;
   display: block;
   transition: all 0.3s ease;
 }
 
 .start-btn:hover {
-  background: white;            /* Fundo branco ao passar */
-  transform: scale(1.02);       /* Aumenta um pouco */
+  background: white;
+  transform: scale(1.02);
 }
 
 .restart-btn {
@@ -281,7 +278,7 @@ body > * {
 }
 
 /* ============================================ */
-/* 10. ESTATÍSTICAS (Pontos, Tempo, Multiplicador, Vidas) */
+/* 10. ESTATÍSTICAS */
 /* ============================================ */
 .stats {
   background: #f8fafc;
@@ -313,7 +310,6 @@ body > * {
   font-weight: bold;
 }
 
-/* Caixinhas de Tempo, Multiplicador e Vidas */
 .timer-box, .multiplier-box, .lives-box {
   text-align: center;
   min-width: 60px;
@@ -334,10 +330,9 @@ body > * {
 }
 
 .timer-display {
-  font-family: monospace;       /* Fonte de relógio */
+  font-family: monospace;
 }
 
-/* Círculos das vidas */
 .lives-display {
   display: flex;
   gap: 3px;
@@ -352,41 +347,42 @@ body > * {
 }
 
 .life-circle.full {
-  background: #ef4444;          /* Vermelho = vida */
+  background: #ef4444;
 }
 
 .life-circle.empty {
-  background: #cbd5e1;          /* Cinza = vida perdida */
+  background: #cbd5e1;
 }
 
 /* ============================================ */
 /* 11. ESTADOS DO JOGO */
 /* ============================================ */
 #game-stats {
-  display: none;                /* Escondido até o jogo começar */
+  display: none;
 }
 
 .game-active #game-stats {
-  display: flex;                /* Mostra quando jogo ativo */
+  display: flex;
 }
 
 .game-active .start-btn {
-  display: none;                /* Esconde botão START durante o jogo */
+  display: none;
 }
 
 /* ============================================ */
 /* 12. TELA DE VITÓRIA */
 /* ============================================ */
 .win-screen {
-  position: fixed;              /* Fixo na tela */
-  top: 50%; left: 50%;          /* Centralizado */
+  position: fixed;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   background: white;
   padding: 20px;
   border-radius: 20px;
   border: 3px solid #c9a13b;
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  z-index: 1000;                /* Fica acima de tudo */
+  z-index: 1000;
   width: 90%;
   max-width: 380px;
   text-align: center;
@@ -414,21 +410,21 @@ body > * {
   color: #c9a13b;
   font-weight: bold;
   font-size: 20px;
-  animation: pulse 1s infinite; /* Animação de pulsar */
+  animation: pulse 1s infinite;
 }
 
-/* Animação de pulsar */
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
 }
 
 /* ============================================ */
-/* 13. MENSAGEM DE STREAK (sequência de acertos) */
+/* 13. MENSAGEM DE STREAK */
 /* ============================================ */
 .streak-message {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   background: #c9a13b;
   color: #1e3c5c;
@@ -443,14 +439,13 @@ body > * {
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* Animação de flutuar para cima */
 @keyframes floatUp {
   0% { opacity: 1; transform: translate(-50%, -50%); }
   100% { opacity: 0; transform: translate(-50%, -150%); }
 }
 
 /* ============================================ */
-/* 14. RODAPÉ (Créditos do ebook) */
+/* 14. RODAPÉ */
 /* ============================================ */
 .ebook-credit {
   margin-top: 15px;
@@ -466,7 +461,7 @@ body > * {
 }
 
 /* ============================================ */
-/* 15. MENU (Cards dos jogos) */
+/* 15. MENU */
 /* ============================================ */
 .menu-content {
   text-align: center;
@@ -507,7 +502,7 @@ body > * {
 }
 
 .game-card:hover {
-  transform: translateY(-5px);  /* Sobe um pouco ao passar */
+  transform: translateY(-5px);
   background: white;
   box-shadow: 0 10px 20px rgba(201, 161, 59, 0.2);
 }
@@ -529,7 +524,6 @@ body > * {
   margin-bottom: 10px;
 }
 
-/* Badges de dificuldade */
 .card-badge {
   display: inline-block;
   padding: 4px 10px;
@@ -540,22 +534,21 @@ body > * {
 }
 
 .card-badge.easy {
-  background: #22c55e;          /* Verde = fácil */
+  background: #22c55e;
 }
 
 .card-badge.medium {
-  background: #f59e0b;          /* Laranja = médio */
+  background: #f59e0b;
 }
 
 .card-badge.hard {
-  background: #ef4444;          /* Vermelho = difícil */
+  background: #ef4444;
 }
 
 .card-badge.expert {
-  background: #9b59b6;          /* Roxo = especialista */
+  background: #9b59b6;
 }
 
-/* Melhor pontuação no card */
 .best-score {
   margin-top: 8px;
   font-size: 11px;
@@ -578,11 +571,424 @@ body > * {
 }
 
 /* ============================================ */
-/* 16. RESPONSIVIDADE (CELULAR) */
+/* 16. TELA DE LOGIN */
+/* ============================================ */
+.auth-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  max-width: 400px;
+  width: 90%;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.8rem;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #5a6d7e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-tab.active {
+  color: #c9a13b;
+  border-bottom: 3px solid #c9a13b;
+}
+
+.auth-form {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-form.active {
+  display: flex;
+}
+
+.auth-input {
+  padding: 0.8rem 1rem;
+  border: 2px solid #d1d9e6;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #c9a13b;
+  box-shadow: 0 0 0 3px rgba(201, 161, 59, 0.2);
+}
+
+.auth-btn {
+  background: #c9a13b;
+  border: 3px solid #b38f32;
+  color: white;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+  background: #b38f32;
+  transform: scale(1.02);
+}
+
+.guest-option {
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #eef2f6;
+}
+
+.guest-btn {
+  background: #f0f4fa;
+  border: 3px solid #c9a13b;
+  color: #1e3c5c;
+  padding: 0.8rem;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.guest-btn:hover {
+  background: white;
+  transform: translateY(-2px);
+}
+
+/* ============================================ */
+/* 17. USUÁRIO */
+/* ============================================ */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  color: #1e3c5c;
+  font-weight: 500;
+  background: #f0f4fa;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+}
+
+.logout-btn {
+  background: none;
+  border: 2px solid #e53e3e;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #e53e3e;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  transform: scale(1.1);
+}
+
+/* ============================================ */
+/* 18. BOTÃO LEADERBOARD */
+/* ============================================ */
+.leaderboard-button-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.leaderboard-header-btn {
+    width: 45px;
+    height: 45px;
+    border: 2px solid #c9a13b;
+    border-radius: 50%;
+    background: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #c9a13b;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.leaderboard-header-btn:hover {
+    background: #f8f4ec;
+    transform: scale(1.1);
+}
+
+/* ============================================ */
+/* 19. MODAL LEADERBOARD */
+/* ============================================ */
+.leaderboard-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.leaderboard-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 2px solid #eef2f6;
+  background: white;
+}
+
+.leaderboard-header h2 {
+  color: #1e3c5c;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #5a6d7e;
+  transition: all 0.3s ease;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close-modal:hover {
+  background: #fee2e2;
+  color: #e53e3e;
+}
+
+.leaderboard-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 15px;
+  background: #f8fafc;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.tab-btn {
+  padding: 8px 14px;
+  background: none;
+  border: 2px solid #c9a13b;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: #1e3c5c;
+}
+
+.tab-btn:hover {
+  background: #f8f4ec;
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  background: #c9a13b;
+  color: white;
+  border-color: #b38f32;
+}
+
+.leaderboard-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  background: white;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eef2f6;
+  gap: 15px;
+}
+
+.leaderboard-rank {
+  width: 45px;
+  font-weight: bold;
+  color: #c9a13b;
+  font-size: 1.1rem;
+}
+
+.leaderboard-name {
+  flex: 1;
+  font-weight: 500;
+  color: #1e3c5c;
+  font-size: 1rem;
+}
+
+.leaderboard-score {
+  font-weight: bold;
+  color: #1e3c5c;
+  font-size: 1rem;
+}
+
+.leaderboard-empty {
+  text-align: center;
+  padding: 40px;
+  color: #5a6d7e;
+  font-size: 1rem;
+}
+
+/* ============================================ */
+/* 20. MODAL DE ENTRADA DE NOME */
+/* ============================================ */
+.name-entry-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2001;
+}
+
+.name-entry-content {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  max-width: 350px;
+  width: 90%;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.name-entry-content h3 {
+  color: #1e3c5c;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.name-entry-content p {
+  color: #5a6d7e;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.name-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #d1d9e6;
+  border-radius: 12px;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8fafc;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: #c9a13b;
+  box-shadow: 0 0 0 3px rgba(201, 161, 59, 0.2);
+}
+
+.name-entry-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.name-entry-btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.name-entry-btn.submit {
+  background: #c9a13b;
+  border: none;
+  color: white;
+}
+
+.name-entry-btn.submit:hover {
+  background: #b38f32;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(201, 161, 59, 0.3);
+}
+
+.name-entry-btn.skip {
+  background: #f0f4fa;
+  border: 2px solid #c9a13b;
+  color: #1e3c5c;
+}
+
+.name-entry-btn.skip:hover {
+  background: white;
+  transform: translateY(-2px);
+}
+
+/* ============================================ */
+/* 21. RESPONSIVIDADE */
 /* ============================================ */
 @media (max-width: 500px) {
   body::before {
-    background-size: 180% auto; /* Águia de fundo maior no celular */
+    background-size: 180% auto;
     opacity: 0.06;
   }
   
@@ -591,7 +997,7 @@ body > * {
   }
   
   .stats {
-    flex-wrap: wrap;            /* Quebra linha no celular */
+    flex-wrap: wrap;
   }
   
   .score-container {
@@ -617,7 +1023,7 @@ body > * {
   }
   
   .game-cards {
-    grid-template-columns: 1fr; /* Uma coluna no celular */
+    grid-template-columns: 1fr;
   }
   
   .eagle-menu-icon {
@@ -633,4 +1039,87 @@ body > * {
     height: 35px;
     font-size: 16px;
   }
+  
+  .leaderboard-btn {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+  
+  .name-entry-content {
+    padding: 20px;
+  }
+  
+  .name-entry-content h3 {
+    font-size: 1.3rem;
+  }
+
+/* ============================================ */
+/* BOTÃO LEADERBOARD - ESTILO DOS GAME CARDS */
+/* ============================================ */
+
+.leaderboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto 35px auto;
+}
+
+.leaderboard-global {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #7f8c8d;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.leaderboard-card-btn {
+    background: #f8fafc;
+    border: 3px solid #c9a13b;
+    border-radius: 20px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.leaderboard-card-btn:hover {
+    transform: translateY(-5px);
+    background: white;
+    box-shadow: 0 10px 20px rgba(201, 161, 59, 0.2);
+}
+
+.leaderboard-trophy {
+    font-size: 2.5rem;
+}
+
+.leaderboard-leaderboards {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #1e3c5c;
+    letter-spacing: 1px;
+    margin-top: 8px;
+
+}
+
+.leaderboard-card {
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+.leaderboard-card .game-card {
+    transition: all 0.3s ease;
+}
+
+.leaderboard-card .game-card:hover {
+    transform: translateY(-5px);
+    background: white;
+    box-shadow: 0 10px 20px rgba(201, 161, 59, 0.2);
+}
+
 }
