@@ -269,115 +269,13 @@ let lives = 3, streak = 0, multiplier = 1, answered = false, availableNumbers = 
 let audioPlayer = null, isAudioMuted = false, gameActive = false, gameEnded = false;
 
 // ============================================
-// 5. EAGLE ANIMAÇÃO (VERSÃO SIMPLIFICADA)
+// 5. EAGLE ANIMAÇÃO
 // ============================================
 
-let lastFrameTime = 0;
-const ANIMATION_FRAME_DELAY = isMobile ? 150 : 100; // 150ms no mobile, 100ms no desktop
+let eagleX = 250, eagleY = 200, eagleTargetX = 250, isJumping = false, jumpProgress = 0, eagleDirection = -1;
+let currentAnimation = 'idle', animationFrame = 0, frameCounter = 0, isAnimating = false;
 
-function animate() {
-    requestAnimationFrame(animate);
-    
-    const now = Date.now();
-    const delta = now - lastFrameTime;
-    
-    // Movimento da águia (sempre suave)
-    updateEagleMovement();
-    
-    // Atualiza os frames da animação apenas quando necessário
-    if (delta >= ANIMATION_FRAME_DELAY) {
-        lastFrameTime = now;
-        updateAnimationFrame();
-    }
-    
-    // Desenha sempre
-    drawEagle();
-}
-
-// Movimento da águia (mantém igual)
-function updateEagleMovement() {
-    if (isJumping) {
-        jumpProgress += JUMP_SPEED;
-        if (jumpProgress >= 1) {
-            eagleX = eagleTargetX;
-            eagleY = 200;
-            isJumping = false;
-            jumpProgress = 0;
-            startAnimation('celebrate');
-        } else {
-            eagleX += (eagleTargetX - eagleX) * HORIZONTAL_EASING;
-            eagleY = 200 - 35 * Math.sin(jumpProgress * Math.PI);
-            if (currentAnimation !== 'flap') startAnimation('flap');
-        }
-    }
-}
-
-// Atualiza o frame da animação (apenas quando necessário)
-function updateAnimationFrame() {
-    if (!isAnimating) return;
-    
-    animationFrame++;
-    
-    if (currentAnimation === 'flap') {
-        if (animationFrame >= eagleImages.flap.length) {
-            animationFrame = 0;
-        }
-    }
-    else if (currentAnimation === 'celebrate') {
-        if (animationFrame >= eagleImages.celebrate.length) {
-            stopAnimation();
-            if (!isJumping && gameActive && answered) nextRound();
-        }
-    }
-    else if (currentAnimation === 'wrong') {
-        if (animationFrame >= eagleImages.wrong.length) {
-            stopAnimation();
-        }
-    }
-}
-
-function drawEagle() {
-    if (!DOM.ctx) return;
-    
-    DOM.ctx.clearRect(0, 0, 500, 250);
-    
-    // Escolhe a imagem baseada na animação atual
-    let img = eagleImages.idle;
-    
-    if (currentAnimation === 'flap' && eagleImages.flap[animationFrame]?.complete) {
-        img = eagleImages.flap[animationFrame];
-    }
-    else if (currentAnimation === 'celebrate' && eagleImages.celebrate[animationFrame]?.complete) {
-        img = eagleImages.celebrate[animationFrame];
-    }
-    else if (currentAnimation === 'wrong' && eagleImages.wrong[animationFrame]?.complete) {
-        img = eagleImages.wrong[animationFrame];
-    }
-    
-    if (img?.complete && img.naturalHeight > 0) {
-        DOM.ctx.save();
-        DOM.ctx.translate(eagleX, eagleY);
-        if (eagleDirection === 1) DOM.ctx.scale(-1, 1);
-        DOM.ctx.scale(1.2, 1);
-        
-        let size = currentAnimation === 'flap' ? 165 : 150;
-        DOM.ctx.drawImage(img, -size/2, -size, size, size);
-        DOM.ctx.restore();
-    }
-}
-
-function startAnimation(type) { 
-    currentAnimation = type; 
-    animationFrame = 0; 
-    isAnimating = true; 
-    lastFrameTime = Date.now(); // Reset para começar imediatamente
-}
-
-function stopAnimation() { 
-    currentAnimation = 'idle'; 
-    animationFrame = 0; 
-    isAnimating = false; 
-}// ============================================
+// ============================================
 // 6. TIMER
 // ============================================
 
@@ -577,18 +475,20 @@ async function loadLeaderboard(gameMode) {
 }
 
 function showNameEntryModal(score, gameMode) {
-    console.log("🎯 Vitória! Score:", score, "GameMode:", gameMode);
+    console.log("🎯 showNameEntryModal CHAMADA! Score:", score, "GameMode:", gameMode);
     
+    // Remover modal existente
     const existingModal = document.querySelector('.name-entry-modal');
     if (existingModal) existingModal.remove();
     
+    // Criar o modal
     const modal = document.createElement('div');
     modal.className = 'name-entry-modal';
     modal.style.zIndex = '10000';
     modal.innerHTML = `
         <div class="name-entry-content">
-            <h3>🏆 YOU WIN! 🏆</h3>
-            <p>You scored <strong style="color:#c9a13b; font-size:1.5rem;">${score}</strong> points</p>
+            <h3>🏆 NEW HIGH SCORE! 🏆</h3>
+            <p>You scored <strong style="color:#c9a13b; font-size:1.2rem;">${score}</strong> points in <strong>${getGameModeName(gameMode)}</strong></p>
             <p>Enter your name for the global leaderboard:</p>
             <input type="text" id="player-name-input" class="name-input" placeholder="Your name" maxlength="20">
             <div class="name-entry-buttons">
@@ -599,23 +499,28 @@ function showNameEntryModal(score, gameMode) {
     `;
     
     document.body.appendChild(modal);
+    console.log("✅ Modal adicionado ao DOM");
     
+    // Focar no input
     setTimeout(() => {
         const nameInput = document.getElementById('player-name-input');
         if (nameInput) nameInput.focus();
     }, 100);
     
+    // Botão Submit
     const submitBtn = document.getElementById('submit-name-btn');
     if (submitBtn) {
         submitBtn.onclick = () => {
             const name = document.getElementById('player-name-input')?.value;
-            const finalName = (name && name.trim()) ? name.trim() : "Anonymous";
-            console.log("💾 Salvando no leaderboard:", finalName, score, gameMode);
-            saveToLeaderboard(gameMode, score, finalName);
+            if (name && name.trim()) {
+                console.log("💾 Salvando no leaderboard:", name, score, gameMode);
+                saveToLeaderboard(gameMode, score, name);
+            }
             modal.remove();
         };
     }
     
+    // Botão Skip
     const skipBtn = document.getElementById('skip-name-btn');
     if (skipBtn) {
         skipBtn.onclick = () => {
@@ -624,20 +529,21 @@ function showNameEntryModal(score, gameMode) {
         };
     }
     
+    // Enter key
     const nameInput = document.getElementById('player-name-input');
     if (nameInput) {
         nameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const name = e.target.value;
-                const finalName = (name && name.trim()) ? name.trim() : "Anonymous";
-                console.log("💾 Salvando no leaderboard (Enter):", finalName, score, gameMode);
-                saveToLeaderboard(gameMode, score, finalName);
+                if (name && name.trim()) {
+                    console.log("💾 Salvando no leaderboard (Enter):", name, score, gameMode);
+                    saveToLeaderboard(gameMode, score, name);
+                }
                 modal.remove();
             }
         });
     }
 }
-
 
 async function showLeaderboardModal() {
     const existingModal = document.querySelector('.leaderboard-modal');
@@ -869,7 +775,7 @@ function startTimer() {
                 DOM.timer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
         }
-    }, 200);
+    }, 100);
 }
 
 function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } endTime = currentTime; }
@@ -961,7 +867,6 @@ function winGame() {
     
     showWinWithBonus();
 }
-
 
 function loseLife() { if (lives > 0) { lives--; updateLives(); if (lives === 0) gameOver(); } }
 
