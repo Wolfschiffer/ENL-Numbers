@@ -1,4 +1,7 @@
-// Configuração do Firebase
+// ============================================
+// FIREBASE CONFIGURAÇÃO
+// ============================================
+
 const firebaseConfig = {
     apiKey: "AIzaSyCkEdRxvECKNmVcMfqDE4jTE_qoNXF7p5c",
     authDomain: "english-next-level-game.firebaseapp.com",
@@ -8,7 +11,6 @@ const firebaseConfig = {
     appId: "1:422019063374:web:b55130f33775f7e1b0ad1f"
 };
 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -21,29 +23,78 @@ let currentUser = null;
 let isGuest = false;
 let currentUserName = "";
 
+// Elementos DOM (inicializados no DOMContentLoaded)
+let domElements = {};
+
+// ============================================
+// FUNÇÕES DE UTILIDADE
+// ============================================
+
+function updateAllUserNames(name) {
+    console.log('🔄 updateAllUserNames chamado com:', name);
+    
+    const elements = [
+        'user-name-display', 'category-user-name', 'words-user-name',
+        'game-user-name', 'vocab-user-name'
+    ];
+    
+    elements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = name;
+            console.log(`✅ Atualizado: ${id} = ${name}`);
+        }
+    });
+    
+    const infoContainers = [
+        'user-info', 'category-user-info', 'words-user-info',
+        'game-user-info', 'vocab-user-info'
+    ];
+    
+    infoContainers.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && name) {
+            el.style.display = 'flex';
+            console.log(`✅ Container visível: ${id}`);
+        } else if (el && !name) {
+            el.style.display = 'none';
+        }
+    });
+}
+
+function showScreen(screenName) {
+    const screens = [
+        'auth-container', 'category-container', 'numbers-menu-container',
+        'game-container', 'vocab-game-container', 'words-menu-container'
+    ];
+    
+    screens.forEach(screen => {
+        const el = document.getElementById(screen);
+        if (el) el.style.display = 'none';
+    });
+    
+    const target = document.getElementById(screenName);
+    if (target) target.style.display = 'block';
+    
+    if (screenName === 'category-container') {
+        const catBtns = document.querySelector('.category-buttons');
+        if (catBtns) catBtns.style.display = 'flex';
+    }
+}
+
+function showLoginScreen() {
+    showScreen('auth-container');
+}
+
+function showCategoryScreen() {
+    showScreen('category-container');
+}
+
+window.showCategoryScreen = showCategoryScreen;
+
 // ============================================
 // FUNÇÕES DE AUTENTICAÇÃO
 // ============================================
-
-function showLoginScreen() {
-    const authContainer = document.getElementById('auth-container');
-    const menuContainer = document.getElementById('menu-container');
-    const gameContainer = document.getElementById('game-container');
-    
-    if (authContainer) authContainer.style.display = 'block';
-    if (menuContainer) menuContainer.style.display = 'none';
-    if (gameContainer) gameContainer.style.display = 'none';
-}
-
-function showMenuScreen() {
-    const authContainer = document.getElementById('auth-container');
-    const menuContainer = document.getElementById('menu-container');
-    const gameContainer = document.getElementById('game-container');
-    
-    if (authContainer) authContainer.style.display = 'none';
-    if (menuContainer) menuContainer.style.display = 'block';
-    if (gameContainer) gameContainer.style.display = 'none';
-}
 
 function login(email, password) {
     return auth.signInWithEmailAndPassword(email, password);
@@ -71,7 +122,6 @@ function logout() {
 auth.onAuthStateChanged((user) => {
     console.log("Auth state changed:", user ? "User logged in" : "No user");
     
-    // Se estamos em modo guest, ignorar mudanças de estado
     if (isGuest) {
         console.log("Guest mode active, ignoring auth change");
         return;
@@ -79,38 +129,64 @@ auth.onAuthStateChanged((user) => {
     
     if (user) {
         currentUser = user;
+        window.currentUser = user;
         isGuest = false;
+        window.isGuest = false;
         
-        db.collection('users').doc(user.uid).get().then((doc) => {
-            if (doc.exists) {
-                currentUserName = doc.data().name;
-            } else {
+        db.collection('users').doc(user.uid).get()
+            .then((doc) => {
+
+                if (doc.exists) {
+    currentUserName = doc.data().name;
+    window.currentUserName = currentUserName;
+    console.log('📛 Nome do Firestore:', currentUserName);
+    
+    // FORÇAR ATUALIZAÇÃO EM TODAS AS TELAS
+    updateAllUserNames(currentUserName);
+    
+} else {
+    currentUserName = user.email.split('@')[0];
+    window.currentUserName = currentUserName;
+    console.log('📛 Nome do email (fallback):', currentUserName);
+    updateAllUserNames(currentUserName);
+}
+                
+                updateAllUserNames(currentUserName);
+                
+                // USAR A MESMA LÓGICA DO GUEST
+                const authContainer = document.getElementById('auth-container');
+                const categoryContainer = document.getElementById('category-container');
+                const categoryButtons = document.querySelector('.category-buttons');
+                
+                if (authContainer) authContainer.style.display = 'none';
+                if (categoryContainer) categoryContainer.style.display = 'block';
+                if (categoryButtons) categoryButtons.style.display = 'flex';
+                
+                if (typeof updateGameUserName === 'function') updateGameUserName();
+            })
+            .catch(() => {
                 currentUserName = user.email.split('@')[0];
-            }
-            
-            const userNameDisplay = document.getElementById('user-name-display');
-            const userInfo = document.getElementById('user-info');
-            
-            if (userNameDisplay) userNameDisplay.textContent = currentUserName;
-            if (userInfo) userInfo.style.display = 'flex';
-            
-            showMenuScreen();
-        }).catch(() => {
-            currentUserName = user.email.split('@')[0];
-            showMenuScreen();
-        });
+                window.currentUserName = currentUserName;
+                updateAllUserNames(currentUserName);
+                
+                const authContainer = document.getElementById('auth-container');
+                const categoryContainer = document.getElementById('category-container');
+                const categoryButtons = document.querySelector('.category-buttons');
+                
+                if (authContainer) authContainer.style.display = 'none';
+                if (categoryContainer) categoryContainer.style.display = 'block';
+                if (categoryButtons) categoryButtons.style.display = 'flex';
+                
+                if (typeof updateGameUserName === 'function') updateGameUserName();
+            });
     } else {
-        // Só mostra tela de login se NÃO estiver em modo guest
         if (!isGuest) {
             currentUser = null;
-            
-            const userInfo = document.getElementById('user-info');
-            if (userInfo) userInfo.style.display = 'none';
-            
             showLoginScreen();
         }
     }
 });
+
 
 // ============================================
 // INICIALIZAR EVENTOS DA TELA DE LOGIN
@@ -119,86 +195,80 @@ auth.onAuthStateChanged((user) => {
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM carregado, configurando eventos de login...");
     
-    // Tabs de login/registro
-    const tabs = document.querySelectorAll('.auth-tab');
+    // Elementos do DOM
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const loginBtn = document.getElementById('login-btn');
     const registerBtn = document.getElementById('register-btn');
     const guestBtn = document.getElementById('guest-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    
-    console.log("Elementos encontrados:", {
-        tabs: tabs.length,
-        loginBtn: !!loginBtn,
-        registerBtn: !!registerBtn,
-        guestBtn: !!guestBtn
-    });
+    const categoryLogoutBtn = document.getElementById('category-logout-btn');
+    const wordsLogoutBtn = document.getElementById('words-logout-btn');
+    const authContainer = document.getElementById('auth-container');
+    const categoryContainer = document.getElementById('category-container');
+const numbersMenu = document.getElementById('numbers-menu-container');
+const gameContainer = document.getElementById('game-container');
+const vocabContainer = document.getElementById('vocab-game-container');
+const wordsMenu = document.getElementById('words-menu-container');
+
+if (authContainer) authContainer.style.display = 'block';
+if (categoryContainer) categoryContainer.style.display = 'none';
+if (numbersMenu) numbersMenu.style.display = 'none';
+if (gameContainer) gameContainer.style.display = 'none';
+if (vocabContainer) vocabContainer.style.display = 'none';
+if (wordsMenu) wordsMenu.style.display = 'none';
     
     // Tabs
-    if (tabs.length) {
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                if (tab.dataset.tab === 'login') {
-                    if (loginForm) loginForm.classList.add('active');
-                    if (registerForm) registerForm.classList.remove('active');
-                } else {
-                    if (loginForm) loginForm.classList.remove('active');
-                    if (registerForm) registerForm.classList.add('active');
-                }
-            });
+    const tabs = document.querySelectorAll('.auth-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const isLogin = tab.dataset.tab === 'login';
+            if (loginForm) loginForm.classList.toggle('active', isLogin);
+            if (registerForm) registerForm.classList.toggle('active', !isLogin);
         });
-    }
+    });
     
-    // Botão de Login
+    // Helper para mostrar erros
+    const showMessage = (btn, msg, isError = true) => {
+        const oldMsg = document.querySelector('.error-message, .success-message');
+        if (oldMsg) oldMsg.remove();
+        
+        const div = document.createElement('div');
+        div.className = isError ? 'error-message' : 'success-message';
+        div.textContent = msg;
+        div.style.cssText = isError 
+            ? 'color:#e53e3e;font-size:0.85rem;margin-top:0.5rem;text-align:center'
+            : 'color:#22c55e;font-size:0.85rem;margin-top:0.5rem;text-align:center';
+        
+        btn.parentNode.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    };
+    
+    // Botão Login
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
-            const emailInput = document.getElementById('login-email');
-            const passwordInput = document.getElementById('login-password');
-            const email = emailInput?.value;
-            const password = passwordInput?.value;
+            const email = document.getElementById('login-email')?.value;
+            const password = document.getElementById('login-password')?.value;
             
-            // Remover mensagens de erro anteriores
-            const oldError = document.querySelector('.error-message');
-            if (oldError) oldError.remove();
-            
-            // Validar campos
-            if (!email || !email.trim()) {
-                showError(loginBtn, "Please enter your email");
-                emailInput?.focus();
-                return;
-            }
-            
-            if (!password || !password.trim()) {
-                showError(loginBtn, "Please enter your password");
-                passwordInput?.focus();
-                return;
-            }
+            if (!email?.trim()) return showMessage(loginBtn, "Please enter your email");
+            if (!password?.trim()) return showMessage(loginBtn, "Please enter your password");
             
             loginBtn.disabled = true;
             loginBtn.textContent = "Logging in...";
             
             login(email, password)
                 .then(() => {
-                    console.log("Login successful");
-                    emailInput.value = "";
-                    passwordInput.value = "";
+                    document.getElementById('login-email').value = "";
+                    document.getElementById('login-password').value = "";
                 })
                 .catch((error) => {
-                    let errorMsg = "Login failed";
-                    if (error.code === 'auth/user-not-found') {
-                        errorMsg = "No account found with this email";
-                    } else if (error.code === 'auth/wrong-password') {
-                        errorMsg = "Incorrect password";
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorMsg = "Invalid email format";
-                    } else {
-                        errorMsg = error.message;
-                    }
-                    showError(loginBtn, errorMsg);
+                    const messages = {
+                        'auth/user-not-found': "No account found with this email",
+                        'auth/wrong-password': "Incorrect password",
+                        'auth/invalid-email': "Invalid email format"
+                    };
+                    showMessage(loginBtn, messages[error.code] || "Login failed");
                 })
                 .finally(() => {
                     loginBtn.disabled = false;
@@ -207,68 +277,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Botão de Registro
+    // Botão Registro
     if (registerBtn) {
         registerBtn.addEventListener('click', () => {
-            const nameInput = document.getElementById('register-name');
-            const emailInput = document.getElementById('register-email');
-            const passwordInput = document.getElementById('register-password');
-            const name = nameInput?.value;
-            const email = emailInput?.value;
-            const password = passwordInput?.value;
+            const name = document.getElementById('register-name')?.value;
+            const email = document.getElementById('register-email')?.value;
+            const password = document.getElementById('register-password')?.value;
             
-            // Remover mensagens de erro anteriores
-            const oldError = document.querySelector('.error-message');
-            if (oldError) oldError.remove();
-            
-            // Validar campos
-            if (!name || !name.trim()) {
-                showError(registerBtn, "Please enter your name");
-                nameInput?.focus();
-                return;
-            }
-            
-            if (!email || !email.trim()) {
-                showError(registerBtn, "Please enter your email");
-                emailInput?.focus();
-                return;
-            }
-            
-            if (!password || !password.trim()) {
-                showError(registerBtn, "Please enter a password");
-                passwordInput?.focus();
-                return;
-            }
-            
-            if (password.length < 6) {
-                showError(registerBtn, "Password must be at least 6 characters");
-                passwordInput?.focus();
-                return;
-            }
+            if (!name?.trim()) return showMessage(registerBtn, "Please enter your name");
+            if (!email?.trim()) return showMessage(registerBtn, "Please enter your email");
+            if (!password?.trim()) return showMessage(registerBtn, "Please enter a password");
+            if (password.length < 6) return showMessage(registerBtn, "Password must be at least 6 characters");
             
             registerBtn.disabled = true;
             registerBtn.textContent = "Registering...";
             
             register(name, email, password)
                 .then(() => {
-                    console.log("Registration successful");
-                    showSuccess(registerBtn, "Account created! Logging in...");
-                    nameInput.value = "";
-                    emailInput.value = "";
-                    passwordInput.value = "";
+                    showMessage(registerBtn, "Account created! Logging in...", false);
+                    document.getElementById('register-name').value = "";
+                    document.getElementById('register-email').value = "";
+                    document.getElementById('register-password').value = "";
                 })
                 .catch((error) => {
-                    let errorMsg = "Registration failed";
-                    if (error.code === 'auth/email-already-in-use') {
-                        errorMsg = "Email already registered";
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorMsg = "Invalid email format";
-                    } else if (error.code === 'auth/weak-password') {
-                        errorMsg = "Password too weak (min 6 chars)";
-                    } else {
-                        errorMsg = error.message;
-                    }
-                    showError(registerBtn, errorMsg);
+                    const messages = {
+                        'auth/email-already-in-use': "Email already registered",
+                        'auth/invalid-email': "Invalid email format",
+                        'auth/weak-password': "Password too weak (min 6 chars)"
+                    };
+                    showMessage(registerBtn, messages[error.code] || "Registration failed");
                 })
                 .finally(() => {
                     registerBtn.disabled = false;
@@ -278,92 +315,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Botão Guest
-    if (guestBtn) {
-        guestBtn.addEventListener('click', () => {
-            console.log("Guest mode selected");
-            isGuest = true;
-            currentUserName = "Guest";
+if (guestBtn) {
+    guestBtn.addEventListener('click', () => {
+        console.log("Guest mode selected");
+        window.isGuest = true;
+        window.currentUser = null;
+        currentUserName = "Guest";
+        updateAllUserNames("Guest");
+        
+        // Forçar a exibição da tela de categorias
+        const authContainer = document.getElementById('auth-container');
+        const categoryContainer = document.getElementById('category-container');
+        
+        if (authContainer) authContainer.style.display = 'none';
+        if (categoryContainer) {
+            categoryContainer.style.display = 'block';
+            console.log('✅ Tela de categorias exibida como guest');
+        }
+        
+        const categoryButtons = document.querySelector('.category-buttons');
+        if (categoryButtons) categoryButtons.style.display = 'flex';
+        
+        if (typeof updateGameUserName === 'function') updateGameUserName();
+    });
+}
+
+
+    
+    // Logout
+    const handleLogout = () => {
+        if (isGuest) {
+            isGuest = false;
             currentUser = null;
-            
-            const userNameDisplay = document.getElementById('user-name-display');
-            const userInfo = document.getElementById('user-info');
-            
-            if (userNameDisplay) userNameDisplay.textContent = "Guest";
-            if (userInfo) userInfo.style.display = 'flex';
-            
-            showMenuScreen();
-        });
-    }
+            showLoginScreen();
+        } else {
+            logout().finally(() => showLoginScreen());
+        }
+    };
     
-    // Botão Logout
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            console.log("Logout clicked");
-            
-            // Se for guest, apenas volta para tela de login
-            if (isGuest) {
-                isGuest = false;
-                currentUser = null;
-                currentUserName = "";
-                
-                const userInfo = document.getElementById('user-info');
-                if (userInfo) userInfo.style.display = 'none';
-                
-                showLoginScreen();
-                return;
-            }
-            
-            // Se for usuário logado, faz logout do Firebase
-            logout().then(() => {
-                console.log("Logged out from Firebase");
-                const userInfo = document.getElementById('user-info');
-                if (userInfo) userInfo.style.display = 'none';
-                showLoginScreen();
-            }).catch((error) => {
-                console.error("Logout error:", error);
-                showLoginScreen();
-            });
-        });
-    }
+    if (categoryLogoutBtn) categoryLogoutBtn.addEventListener('click', handleLogout);
+    if (wordsLogoutBtn) wordsLogoutBtn.addEventListener('click', handleLogout);
 });
-
-// ============================================
-// FUNÇÕES AUXILIARES
-// ============================================
-
-function showError(button, message) {
-    const oldError = document.querySelector('.error-message');
-    if (oldError) oldError.remove();
-    
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    errorDiv.style.color = '#e53e3e';
-    errorDiv.style.fontSize = '0.85rem';
-    errorDiv.style.marginTop = '0.5rem';
-    errorDiv.style.textAlign = 'center';
-    errorDiv.style.fontWeight = '500';
-    
-    button.parentNode.appendChild(errorDiv);
-    
-    setTimeout(() => {
-        errorDiv.remove();
-    }, 3000);
-}
-
-function showSuccess(button, message) {
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.textContent = message;
-    successDiv.style.color = '#22c55e';
-    successDiv.style.fontSize = '0.85rem';
-    successDiv.style.marginTop = '0.5rem';
-    successDiv.style.textAlign = 'center';
-    successDiv.style.fontWeight = '500';
-    
-    button.parentNode.appendChild(successDiv);
-    
-    setTimeout(() => {
-        successDiv.remove();
-    }, 2000);
-}
