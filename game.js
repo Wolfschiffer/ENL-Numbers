@@ -1661,7 +1661,11 @@ let touchClone = null;
 let touchStartY = 0;
 
 function handleTouchStart(e) {
-    e.preventDefault();
+    // Verifica se o evento pode ser cancelado
+    if (e.cancelable) {
+        e.preventDefault();
+    }
+    
     const target = e.target.closest('.english-item');
     if (!target || target.classList.contains('locked')) return;
     
@@ -1670,9 +1674,11 @@ function handleTouchStart(e) {
     touchSourceIndex = parseInt(target.getAttribute('data-index'));
     touchStartY = e.touches[0].clientY;
     
-    // Feedback visual: elemento fica transparente
+    // === FEEDBACK VISUAL ===
     target.style.opacity = '0.5';
     target.style.transform = 'scale(0.98)';
+    target.style.transition = 'all 0.2s ease';
+    target.classList.add('dragging-source');
     
     // Cria um clone para seguir o dedo
     touchClone = target.cloneNode(true);
@@ -1684,6 +1690,7 @@ function handleTouchStart(e) {
     touchClone.style.pointerEvents = 'none';
     touchClone.style.zIndex = '9999';
     touchClone.style.transform = 'scale(1.05)';
+    touchClone.style.transition = 'transform 0.1s ease';
     document.body.appendChild(touchClone);
     
     document.body.classList.add('dragging');
@@ -1691,7 +1698,10 @@ function handleTouchStart(e) {
 
 function handleTouchMove(e) {
     if (!touchActive || !touchClone) return;
-    e.preventDefault();
+    
+    if (e.cancelable) {
+        e.preventDefault();
+    }
     
     const touchY = e.touches[0].clientY;
     const touchX = e.touches[0].clientX;
@@ -1714,23 +1724,35 @@ function handleTouchMove(e) {
     // Remove highlight de todos
     document.querySelectorAll('.english-item').forEach(item => {
         item.classList.remove('drag-over');
+        item.style.transform = '';
+        item.style.backgroundColor = '';
     });
     
-    // Adiciona highlight no alvo
+    // === FEEDBACK VISUAL NO ALVO ===
     if (targetItem && targetItem !== touchSourceElement) {
         targetItem.classList.add('drag-over');
+        targetItem.style.backgroundColor = '#c9a13b';
+        targetItem.style.color = 'white';
+        targetItem.style.transform = 'scale(1.02)';
+        targetItem.style.transition = 'all 0.1s ease';
     }
 }
 
 function handleTouchEnd(e) {
     if (!touchActive) {
         document.querySelectorAll('.english-item').forEach(item => {
-            item.classList.remove('drag-over');
+            item.classList.remove('drag-over', 'dragging-source');
+            item.style.opacity = '';
+            item.style.transform = '';
+            item.style.backgroundColor = '';
+            item.style.color = '';
         });
         return;
     }
     
-    e.preventDefault();
+    if (e.cancelable) {
+        e.preventDefault();
+    }
     
     const touchEndX = e.changedTouches[0].clientX;
     const touchEndY = e.changedTouches[0].clientY;
@@ -1739,6 +1761,7 @@ function handleTouchEnd(e) {
     if (touchSourceElement) {
         touchSourceElement.style.opacity = '1';
         touchSourceElement.style.transform = '';
+        touchSourceElement.classList.remove('dragging-source');
     }
     
     // Remove o clone
@@ -1758,7 +1781,7 @@ function handleTouchEnd(e) {
         }
     }
     
-    // Se encontrou um alvo diferente, reorganiza
+    // Se encontrou um alvo diferente, reorganiza (comportamento igual ao desktop)
     if (targetItem && touchSourceIndex !== null) {
         const targetIndex = parseInt(targetItem.getAttribute('data-index'));
         
@@ -1790,15 +1813,20 @@ function handleTouchEnd(e) {
                     }
                 }
                 
+                // Re-renderiza e verifica matches
                 renderVocabularyLists();
                 checkAndLockMatches();
             }
         }
     }
     
-    // Limpa tudo
+    // Limpa todos os estilos visuais
     document.querySelectorAll('.english-item').forEach(item => {
-        item.classList.remove('drag-over');
+        item.classList.remove('drag-over', 'dragging-source');
+        item.style.opacity = '';
+        item.style.transform = '';
+        item.style.backgroundColor = '';
+        item.style.color = '';
     });
     
     touchActive = false;
@@ -1806,7 +1834,6 @@ function handleTouchEnd(e) {
     touchSourceIndex = null;
     document.body.classList.remove('dragging');
 }
-
 
 // ============================================
 // MENU DE WORDS

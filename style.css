@@ -1,0 +1,1691 @@
+/* ============================================ */
+/* 1. RESET BÁSICO */
+/* ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================ */
+/* 2. FUNDO DA PÁGINA */
+/* ============================================ */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e3c5c 0%, #2b5a84 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../images/eagle-transparent.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 140% auto;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(0.5px);
+  mix-blend-mode: soft-light;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================ */
+/* 3. CONTAINERS PRINCIPAIS */
+/* ============================================ */
+.game-container {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  width: 100%;
+  margin: 0 auto;
+}
+
+#menu-container {
+  max-width: 800px;
+}
+
+#game-container {
+  max-width: 600px;
+}
+
+/* ============================================ */
+/* 4. CABEÇALHO */
+/* ============================================ */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.title-section h1 {
+  color: #1e3c5c;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.title-section .highlight {
+  color: #c9a13b;
+  font-size: 28px;
+  font-weight: 800;
+  display: block;
+}
+
+.title-section .subtitle {
+  color: #7f8c8d;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.menu-btn, .speaker-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #c9a13b;
+  border-radius: 50%;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #c9a13b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.menu-btn:hover, .speaker-btn:hover {
+  background: #f8f4ec;
+  transform: scale(1.1);
+}
+
+.speaker-btn.muted {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* ============================================ */
+/* 5. INSTRUÇÕES */
+/* ============================================ */
+.instructions {
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #d1d9e6;
+  color: #1e3c5c;
+  font-weight: 500;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ============================================ */
+/* 6. CANVAS */
+/* ============================================ */
+#stickman-canvas {
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+  background: #f8fafc;
+  border: 2px solid #c9a13b;
+  border-radius: 10px;
+  margin: 0 auto 15px;
+  display: block;
+}
+
+/* ============================================ */
+/* 7. PLATAFORMAS */
+/* ============================================ */
+.platforms {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 15px 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.platform {
+  aspect-ratio: 1;
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 15px;
+  font-size: 32px;
+  font-weight: bold;
+  color: #1e3c5c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.platform:hover {
+  background: white;
+  transform: scale(1.02);
+}
+
+.platform.correct {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.platform.wrong {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* ============================================ */
+/* 8. WORD BOX */
+/* ============================================ */
+.word-box {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  border: 2px solid #c9a13b;
+  font-size: 32px;
+  font-weight: bold;
+  color: #1e3c5c;
+  text-align: center;
+  text-transform: capitalize;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================ */
+/* 9. BOTÕES PRINCIPAIS */
+/* ============================================ */
+.start-btn {
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 15px;
+  padding: 12px 20px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1e3c5c;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  margin: 15px auto;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+  background: white;
+  transform: scale(1.02);
+}
+
+.restart-btn {
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 15px;
+  padding: 12px 25px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #1e3c5c;
+  cursor: pointer;
+  margin: 15px auto;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.restart-btn:hover {
+  background: white;
+  transform: scale(1.02);
+}
+
+/* ============================================ */
+/* 10. ESTATÍSTICAS */
+/* ============================================ */
+.stats {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 10px;
+}
+
+.score-container {
+  text-align: left;
+  flex: 1;
+}
+
+.score-container p {
+  font-size: 14px;
+  color: #1e3c5c;
+  margin: 2px 0;
+}
+
+.high-score {
+  color: #c9a13b !important;
+  font-weight: bold;
+}
+
+.timer-box, .multiplier-box, .lives-box {
+  text-align: center;
+  min-width: 60px;
+}
+
+.timer-box span, .multiplier-box span, .lives-box span {
+  font-size: 11px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.timer-display, .multiplier-display {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1e3c5c;
+}
+
+.timer-display {
+  font-family: monospace;
+}
+
+.lives-display {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+}
+
+.life-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.life-circle.full {
+  background: #ef4444;
+}
+
+.life-circle.empty {
+  background: #cbd5e1;
+}
+
+/* ============================================ */
+/* 11. ESTADOS DO JOGO */
+/* ============================================ */
+#game-stats {
+  display: none;
+}
+
+.game-active #game-stats {
+  display: flex;
+}
+
+.game-active .start-btn {
+  display: none;
+}
+
+/* ============================================ */
+/* 12. TELA DE VITÓRIA */
+/* ============================================ */
+.win-screen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  z-index: 1000;
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+}
+
+.win-screen h2 {
+  color: #1e3c5c;
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.win-stats {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.win-stats p {
+  margin: 5px 0;
+  color: #1e3c5c;
+}
+
+.time-title {
+  color: #c9a13b;
+  font-weight: bold;
+  font-size: 20px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ============================================ */
+/* 13. MENSAGEM DE STREAK */
+/* ============================================ */
+.streak-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #c9a13b;
+  color: #1e3c5c;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 18px;
+  animation: floatUp 1.5s ease-out forwards;
+  z-index: 100;
+  white-space: nowrap;
+  border: 2px solid white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+@keyframes floatUp {
+  0% { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -150%); }
+}
+
+/* ============================================ */
+/* 14. RODAPÉ */
+/* ============================================ */
+.ebook-credit {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed #c9a13b;
+  color: #7f8c8d;
+  font-size: 12px;
+  text-align: center;
+}
+
+.ebook-credit strong {
+  color: #c9a13b;
+}
+
+/* ============================================ */
+/* 15. MENU */
+/* ============================================ */
+.menu-content {
+  text-align: center;
+}
+
+.eagle-menu-icon {
+  font-size: 80px;
+  margin: 10px 0;
+}
+
+.eagle-menu-icon img {
+  width: 144px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.menu-title {
+  color: #1e3c5c;
+  font-size: 28px;
+  margin: 15px 0;
+}
+
+.game-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.game-card {
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 15px;
+  padding: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  background: white;
+  box-shadow: 0 10px 20px rgba(201, 161, 59, 0.2);
+}
+
+.card-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.game-card h3 {
+  color: #1e3c5c;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.game-card p {
+  color: #7f8c8d;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.card-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+}
+
+.card-badge.easy {
+  background: #22c55e;
+}
+
+.card-badge.medium {
+  background: #f59e0b;
+}
+
+.card-badge.hard {
+  background: #ef4444;
+}
+
+.card-badge.expert {
+  background: #9b59b6;
+}
+
+.best-score {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #c9a13b;
+  font-weight: bold;
+}
+
+.best-score-value {
+  color: #1e3c5c;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.menu-footer {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px dashed #c9a13b;
+  color: #7f8c8d;
+  font-size: 12px;
+}
+
+/* ============================================ */
+/* 16. TELA DE LOGIN */
+/* ============================================ */
+.auth-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  max-width: 400px;
+  width: 90%;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.8rem;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #5a6d7e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-tab.active {
+  color: #c9a13b;
+  border-bottom: 3px solid #c9a13b;
+}
+
+.auth-form {
+  display: none;
+  gap: 1rem;
+}
+
+.auth-form.active {
+  display: flex;
+}
+
+.auth-input {
+  padding: 0.8rem 1rem;
+  border: 2px solid #d1d9e6;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #c9a13b;
+  box-shadow: 0 0 0 3px rgba(201, 161, 59, 0.2);
+}
+
+.auth-btn {
+  background: #c9a13b;
+  border: 3px solid #b38f32;
+  color: white;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+  background: #b38f32;
+  transform: scale(1.02);
+}
+
+.guest-option {
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #eef2f6;
+}
+
+.guest-btn {
+  background: #f0f4fa;
+  border: 3px solid #c9a13b;
+  color: #1e3c5c;
+  padding: 0.8rem;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.guest-btn:hover {
+  background: white;
+  transform: translateY(-2px);
+}
+
+/* ============================================ */
+/* 16.1. CORREÇÕES PARA MOBILE */
+/* ============================================ */
+@media (max-width: 770px) {
+  .auth-container {
+    z-index: 10000 !important;
+    width: 95%;
+    max-width: 350px;
+    padding: 1.5rem;
+  }
+  
+  .auth-input {
+    font-size: 16px !important;
+    padding: 12px 15px !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  .auth-tab {
+    padding: 12px 0;
+    font-size: 1rem;
+  }
+  
+  .auth-btn, .guest-btn {
+    padding: 12px;
+    font-size: 1rem;
+  }
+  
+  body {
+    overflow: auto !important;
+    position: relative !important;
+  }
+}
+
+.auth-input, 
+.auth-btn, 
+.guest-btn, 
+.auth-tab {
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.auth-container * {
+  pointer-events: auto;
+}
+
+/* ============================================ */
+/* 17. USUÁRIO */
+/* ============================================ */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  color: #1e3c5c;
+  font-weight: 500;
+  background: #f0f4fa;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+}
+
+.logout-btn {
+  background: none;
+  border: 2px solid #e53e3e;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #e53e3e;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  transform: scale(1.1);
+}
+
+/* ============================================ */
+/* 18. BOTÃO LEADERBOARD */
+/* ============================================ */
+.leaderboard-button-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.leaderboard-header-btn {
+  width: 45px;
+  height: 45px;
+  border: 2px solid #c9a13b;
+  border-radius: 50%;
+  background: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #c9a13b;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaderboard-header-btn:hover {
+  background: #f8f4ec;
+  transform: scale(1.1);
+}
+
+/* ============================================ */
+/* 19. MODAL LEADERBOARD */
+/* ============================================ */
+.leaderboard-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.leaderboard-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 2px solid #eef2f6;
+  background: white;
+}
+
+.leaderboard-header h2 {
+  color: #1e3c5c;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #5a6d7e;
+  transition: all 0.3s ease;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close-modal:hover {
+  background: #fee2e2;
+  color: #e53e3e;
+}
+
+.leaderboard-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 15px;
+  background: #f8fafc;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.tab-btn {
+  padding: 8px 14px;
+  background: none;
+  border: 2px solid #c9a13b;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: #1e3c5c;
+}
+
+.tab-btn:hover {
+  background: #f8f4ec;
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  background: #c9a13b;
+  color: white;
+  border-color: #b38f32;
+}
+
+.leaderboard-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  background: white;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eef2f6;
+  gap: 15px;
+}
+
+.leaderboard-rank {
+  width: 45px;
+  font-weight: bold;
+  color: #c9a13b;
+  font-size: 1.1rem;
+}
+
+.leaderboard-name {
+  flex: 1;
+  font-weight: 500;
+  color: #1e3c5c;
+  font-size: 1rem;
+}
+
+.leaderboard-score {
+  font-weight: bold;
+  color: #1e3c5c;
+  font-size: 1rem;
+}
+
+.leaderboard-empty {
+  text-align: center;
+  padding: 40px;
+  color: #5a6d7e;
+  font-size: 1rem;
+}
+
+/* ============================================ */
+/* 20. MODAL DE ENTRADA DE NOME */
+/* ============================================ */
+.name-entry-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2001;
+}
+
+.name-entry-content {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  max-width: 350px;
+  width: 90%;
+  border: 3px solid #c9a13b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.name-entry-content h3 {
+  color: #1e3c5c;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.name-entry-content p {
+  color: #5a6d7e;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.name-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #d1d9e6;
+  border-radius: 12px;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8fafc;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: #c9a13b;
+  box-shadow: 0 0 0 3px rgba(201, 161, 59, 0.2);
+}
+
+.name-entry-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.name-entry-btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.name-entry-btn.submit {
+  background: #c9a13b;
+  border: none;
+  color: white;
+}
+
+.name-entry-btn.submit:hover {
+  background: #b38f32;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(201, 161, 59, 0.3);
+}
+
+.name-entry-btn.skip {
+  background: #f0f4fa;
+  border: 2px solid #c9a13b;
+  color: #1e3c5c;
+}
+
+.name-entry-btn.skip:hover {
+  background: white;
+  transform: translateY(-2px);
+}
+
+/* ============================================ */
+/* 21. RESPONSIVIDADE */
+/* ============================================ */
+@media (max-width: 500px) {
+  body::before {
+    background-size: 180% auto;
+    opacity: 0.06;
+  }
+  
+  .game-container {
+    padding: 15px;
+  }
+  
+  .stats {
+    flex-wrap: wrap;
+  }
+  
+  .score-container {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
+  .platform {
+    font-size: 28px;
+    min-height: 55px;
+  }
+  
+  .word-box {
+    font-size: 24px;
+    padding: 12px;
+    min-height: 65px;
+  }
+  
+  .start-btn {
+    font-size: 22px;
+    padding: 10px 15px;
+  }
+  
+  .game-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .eagle-menu-icon {
+    font-size: 60px;
+  }
+  
+  .menu-title {
+    font-size: 22px;
+  }
+  
+  .menu-btn, .speaker-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+  
+  .leaderboard-btn {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
+  
+  .name-entry-content {
+    padding: 20px;
+  }
+  
+  .name-entry-content h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/* ============================================ */
+/* 22. BOTÃO LEADERBOARD - ESTILO DOS GAME CARDS */
+/* ============================================ */
+.leaderboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto 35px auto;
+}
+
+.leaderboard-global {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #7f8c8d;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.leaderboard-card-btn {
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 20px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.leaderboard-card-btn:hover {
+  transform: translateY(-5px);
+  background: white;
+  box-shadow: 0 10px 20px rgba(201, 161, 59, 0.2);
+}
+
+.leaderboard-trophy {
+  font-size: 2.5rem;
+}
+
+.leaderboard-leaderboards {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #1e3c5c;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.leaderboard-card {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.leaderboard-card .game-card {
+  transition: all 0.3s ease;
+}
+
+.leaderboard-card .game-card:hover {
+  transform: translateY(-5px);
+  background: white;
+  box-shadow: 0 10px 20px rgba(201, 161, 59, 0.2);
+}
+
+/* ============================================ */
+/* 23. POPUP DE PONTUAÇÃO */
+/* ============================================ */
+.score-popup {
+  animation: floatUp 0.8s ease-out forwards;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -150%) scale(1.2);
+  }
+}
+
+/* ============================================ */
+/* 24. TELA DE CATEGORIAS (NUMBERS / WORDS) */
+/* ============================================ */
+#category-container .category-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin: 30px 0;
+}
+
+#category-container .category-card {
+  background: #f8fafc;
+  border: 3px solid #c9a13b;
+  border-radius: 20px;
+  padding: 25px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#category-container .category-card:hover {
+  transform: translateY(-5px);
+  background: white;
+  box-shadow: 0 10px 20px rgba(201, 161, 59, 0.2);
+}
+
+#category-container .category-card:active {
+  transform: translateY(-2px);
+}
+
+#category-container .category-icon {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+}
+
+#category-container .category-card h2 {
+  color: #1e3c5c;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+#category-container .category-card p {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+#category-container .category-badge {
+  display: inline-block;
+  background: #c9a13b;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* Botão de voltar */
+#back-to-category-btn {
+  background: #f8fafc;
+  border: 2px solid #c9a13b;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #c9a13b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+#back-to-category-btn:hover {
+  background: #f8f4ec;
+  transform: scale(1.1);
+}
+
+/* Responsivo */
+@media (max-width: 500px) {
+  #category-container .category-card {
+    padding: 20px 15px;
+  }
+  #category-container .category-icon {
+    font-size: 2.8rem;
+  }
+  #category-container .category-card h2 {
+    font-size: 1.3rem;
+  }
+}
+
+/* ============================================ */
+/* 25. JOGO DE VOCABULÁRIO - VOCABULARY MATCH */
+/* ============================================ */
+#vocab-game-container {
+  margin-top: 20px;
+}
+
+.vocab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #c9a13b;
+}
+
+.vocab-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.vocab-header-left h2 {
+  color: #1e3c5c;
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.vocab-header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.vocab-stats {
+  background: #f8fafc;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid #c9a13b;
+  font-weight: bold;
+  color: #1e3c5c;
+}
+
+.vocab-back-btn {
+  background: #f8fafc;
+  border: 2px solid #c9a13b;
+  border-radius: 25px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #1e3c5c;
+  transition: all 0.3s ease;
+}
+
+.vocab-back-btn:hover {
+  background: white;
+  transform: scale(1.02);
+}
+
+/* SEM flex-wrap: nowrap para NUNCA quebrar */
+.vocab-game-area {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: nowrap !important;
+}
+
+.vocab-column {
+  flex: 1;
+  min-width: 0;
+  background: #f8fafc;
+  border-radius: 15px;
+  padding: 15px;
+  border: 2px solid #c9a13b;
+}
+
+.vocab-column h3 {
+  text-align: center;
+  color: #c9a13b;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.vocab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vocab-item {
+  background: white;
+  border: 2px solid #d1d9e6;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  color: #1e3c5c;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vocab-item:hover {
+  border-color: #c9a13b;
+  transform: scale(1.02);
+  background: #fff8f0;
+}
+
+.vocab-item.selected {
+  background: #c9a13b;
+  color: white;
+  border-color: #b38f32;
+  transform: scale(1.02);
+}
+
+.vocab-item.matched {
+  display: none;
+}
+
+.vocab-message {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.vocab-message.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #22c55e;
+}
+
+.vocab-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+.vocab-message.win {
+  background: #c9a13b;
+  color: white;
+  font-size: 1.2rem;
+}
+
+/* ============================================ */
+/* 26. HEADER PADRONIZADO */
+/* ============================================ */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* ============================================ */
+/* 27. DRAG AND DROP (MOBILE) */
+/* ============================================ */
+body.dragging {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+.portuguese-item.drag-over {
+  background: #c9a13b !important;
+  color: white !important;
+  border-color: #b38f32 !important;
+  transform: scale(1.02);
+  transition: all 0.1s ease;
+}
+
+/* ============================================ */
+/* 28. ESCONDE BOTÕES FORA DA TELA WORDS */
+/* ============================================ */
+body:not([data-screen="words"]) [data-words-only="true"] {
+  display: none !important;
+}
+
+/* ============================================ */
+/* MOBILE - JOGO DE VOCABULÁRIO */
+/* ============================================ */
+
+/* Para tablets e celulares maiores (768px ou menos) */
+@media (max-width: 770px) {
+    /* Força as colunas ficarem lado a lado */
+    .vocab-game-area {
+        flex-direction: row !important;
+        gap: 10px !important;
+    }
+    
+    .vocab-column {
+  flex: 1;
+  min-width: 0;  /* ← PERMITE ENCOLHER */
+    
+    .vocab-column h3 {
+        font-size: 0.9rem !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .vocab-item {
+        padding: 6px 8px !important;
+        font-size: 0.75rem !important;
+        border-radius: 8px !important;
+    }
+    
+    .vocab-list {
+        gap: 6px !important;
+        min-height: auto !important;
+    }
+    
+    .vocab-header-left h2 {
+        font-size: 1rem !important;
+    }
+    
+    .vocab-stats {
+        padding: 3px 8px !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .menu-btn {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+
+/* ============================================ */
+/* 29. TELAS MUITO PEQUENAS (iPhone SE, 375px) */
+/* ============================================ */
+
+@media (max-width: 400px) {
+    /* Reduz padding do body */
+    body {
+        padding: 8px !important;
+    }
+    
+    /* Container principal mais compacto */
+    .game-container {
+        padding: 10px !important;
+    }
+    
+    /* Título menor */
+    .title-section h1 {
+        font-size: 16px !important;
+    }
+    
+    .title-section .highlight {
+        font-size: 20px !important;
+    }
+    
+    .title-section .subtitle {
+        font-size: 8px !important;
+    }
+    
+    /* Botões de menu menores */
+    .menu-btn, .speaker-btn {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 12px !important;
+    }
+    
+    /* Nome do usuário menor */
+    .user-name {
+        font-size: 0.65rem !important;
+        padding: 0.2rem 0.5rem !important;
+    }
+    
+    /* Botões de categoria (NUMBERS e WORDS) */
+    #category-container .category-card {
+        padding: 12px 8px !important;
+    }
+    
+    #category-container .category-icon {
+        font-size: 2rem !important;
+    }
+    
+    #category-container .category-card h2 {
+        font-size: 1rem !important;
+    }
+    
+    #category-container .category-card p {
+        font-size: 0.65rem !important;
+    }
+    
+    .category-badge {
+        font-size: 0.6rem !important;
+        padding: 2px 8px !important;
+    }
+    
+    /* Jogo de vocabulário */
+    .vocab-header-left h2 {
+        font-size: 0.85rem !important;
+    }
+    
+    .vocab-stats {
+        font-size: 0.6rem !important;
+        padding: 2px 5px !important;
+    }
+    
+    .vocab-column h3 {
+        font-size: 0.75rem !important;
+    }
+    
+    .vocab-item {
+        padding: 5px !important;
+        font-size: 0.65rem !important;
+    }
+    
+    /* Águia */
+    .eagle-menu-icon img {
+        width: 80px !important;
+        height: 60px !important;
+    }
+    
+    .menu-title {
+        font-size: 16px !important;
+        margin: 8px 0 !important;
+    }
+    
+    /* Cards */
+    .game-card {
+        padding: 8px !important;
+    }
+    
+    .game-card h3 {
+        font-size: 12px !important;
+    }
+    
+    .game-card p {
+        font-size: 9px !important;
+    }
+    
+    .card-icon {
+        font-size: 24px !important;
+    }
+    
+    /* Jogo de números */
+    .platform {
+        font-size: 18px !important;
+        min-height: 40px !important;
+    }
+    
+    .word-box {
+        font-size: 16px !important;
+        padding: 6px !important;
+        min-height: 45px !important;
+    }
+    
+    .start-btn {
+        font-size: 16px !important;
+        padding: 6px !important;
+    }
+    
+    .stats {
+        padding: 6px !important;
+    }
+    
+    /* Rodapé */
+    .menu-footer, .ebook-credit {
+        font-size: 8px !important;
+        margin-top: 8px !important;
+    }
+}
+
+/* Feedback visual durante drag */
+.english-item.drag-over {
+    background: #c9a13b !important;
+    color: white !important;
+    border-color: #b38f32 !important;
+    transform: scale(1.02);
+    transition: all 0.1s ease;
+}
+
+/* Efeito no elemento sendo arrastado */
+.english-item.dragging-source {
+    opacity: 0.3;
+}
+
+/* ============================================ */
+/* FEEDBACK VISUAL PARA DRAG AND DROP MOBILE */
+/* ============================================ */
+
+/* Item sendo arrastado */
+.english-item.dragging-source {
+    opacity: 0.5 !important;
+    transform: scale(0.98) !important;
+}
+
+/* Item alvo durante o drag */
+.english-item.drag-over {
+    background: #c9a13b !important;
+    color: white !important;
+    border-color: #b38f32 !important;
+    transform: scale(1.02) !important;
+    transition: all 0.1s ease !important;
+}
+
+/* Garante que o clone do drag fique visível */
+body.dragging {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
