@@ -1649,3 +1649,23 @@ body:not([data-screen="words"]) [data-words-only="true"] {
         margin-top: 8px !important;
     }
 }
+
+/* Feedback visual para drag and drop mobile */
+.english-item.drag-over {
+    background: #c9a13b !important;
+    color: white !important;
+    border-color: #b38f32 !important;
+    transform: scale(1.02);
+    transition: all 0.1s ease;
+}
+
+.english-item.dragging-source {
+    opacity: 0.5 !important;
+    transform: scale(0.98) !important;
+}
+
+body.dragging {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
