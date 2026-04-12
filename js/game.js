@@ -1484,8 +1484,6 @@ const vocabularyData = [
 let currentEnglishWords = [];
 let currentPortugueseWords = [];
 let matchesCount = 0;
-let draggedIndex = null;
-let draggedElement = null;
 
 const englishList = document.getElementById('english-words-list');
 const portugueseList = document.getElementById('portuguese-words-list');
@@ -1528,8 +1526,142 @@ currentScreen = SCREENS.WORDS_GAME;
 }
 
 
+// ============================================
+// DRAG AND DROP PARA DESKTOP (REORGANIZAR)
+// ============================================
+
+let draggedItem = null;
+let draggedIndex = null;
+
+function handleDragStart(e) {
+    draggedElement = e.target;  // ← mudou de draggedItem para draggedElement
+    draggedIndex = parseInt(draggedElement.getAttribute('data-index'));
+    e.target.style.opacity = '0.5';
+    e.dataTransfer.setData('text/plain', '');
+    e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragEnd(e) {
+    if (draggedElement) draggedElement.style.opacity = '1';
+    document.querySelectorAll('.english-item').forEach(item => {
+        item.classList.remove('drag-over');
+    });
+    draggedElement = null;
+    draggedIndex = null;
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const target = e.target.closest('.english-item');
+    if (target && target !== draggedElement && !target.classList.contains('locked')) {
+        document.querySelectorAll('.english-item').forEach(item => {
+            item.classList.remove('drag-over');
+        });
+        target.classList.add('drag-over');
+    }
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    const target = e.target.closest('.english-item');
+    if (!target || draggedElement === null || draggedIndex === null) return;
+    if (target.classList.contains('locked')) return;
+    
+    const targetIndex = parseInt(target.getAttribute('data-index'));
+    if (isNaN(targetIndex) || draggedIndex === targetIndex) return;
+    
+    const activeEnglish = currentEnglishWords.filter(item => !item.locked);
+    
+    let realDraggedIndex = -1;
+    let realTargetIndex = -1;
+    let filteredIndex = 0;
+    for (let i = 0; i < currentEnglishWords.length; i++) {
+        if (!currentEnglishWords[i].locked) {
+            if (i === draggedIndex) realDraggedIndex = filteredIndex;
+            if (i === targetIndex) realTargetIndex = filteredIndex;
+            filteredIndex++;
+        }
+    }
+    
+    if (realDraggedIndex === -1 || realTargetIndex === -1) return;
+    
+    const [movedItem] = activeEnglish.splice(realDraggedIndex, 1);
+    activeEnglish.splice(realTargetIndex, 0, movedItem);
+    
+    let activePos = 0;
+    for (let i = 0; i < currentEnglishWords.length; i++) {
+        if (!currentEnglishWords[i].locked) {
+            currentEnglishWords[i] = activeEnglish[activePos];
+            activePos++;
+        }
+    }
+    
+    renderVocabularyLists();
+    checkAndLockMatches();
+    
+    draggedElement = null;
+    draggedIndex = null;
+}
+
+// ============================================
+// MOSTRA MENSAGEM NO JOGO DE VOCABULÁRIO
+// ============================================
+
+function showVocabMessage(message, type) {
+    if (!vocabMessage) return;
+    vocabMessage.innerHTML = message;
+    vocabMessage.className = `vocab-message ${type}`;
+    setTimeout(() => {
+        if (vocabMessage.innerHTML === message) {
+            vocabMessage.innerHTML = '';
+            vocabMessage.className = 'vocab-message';
+        }
+    }, 2000);
+}
+
+
+// ============================================
+// VERIFICA E TRAVA OS MATCHES
+// ============================================
+
+function checkAndLockMatches() {
+    let anyMatch = false;
+    
+    for (let i = 0; i < currentEnglishWords.length; i++) {
+        const englishItem = currentEnglishWords[i];
+        const portugueseItem = currentPortugueseWords[i];
+        
+        if (!englishItem.locked && !portugueseItem.locked && englishItem.id === portugueseItem.id) {
+            englishItem.locked = true;
+            portugueseItem.locked = true;
+            matchesCount++;
+            anyMatch = true;
+        }
+    }
+    
+    if (anyMatch) {
+        if (vocabMatchesSpan) vocabMatchesSpan.textContent = matchesCount;
+        showVocabMessage('✓ Correct match! Pair locked!', 'success');
+        renderVocabularyLists();
+        
+        if (matchesCount === currentEnglishWords.length) {
+            showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
+        }
+    }
+}
+
+
+// ============================================
+// RENDERIZA AS LISTAS (SUA VERSÃO)
+// ============================================
+
 function renderVocabularyLists() {
     if (!englishList || !portugueseList) return;
+    
+    console.log('Renderizando listas...');
+    console.log('English words:', currentEnglishWords);
+    console.log('Portuguese words:', currentPortugueseWords);
     
     englishList.innerHTML = '';
     currentEnglishWords.forEach((item, idx) => {
@@ -1543,18 +1675,16 @@ function renderVocabularyLists() {
             div.setAttribute('data-index', idx);
             div.setAttribute('draggable', 'true');
             
-            // Eventos de mouse (desktop)
             div.addEventListener('dragstart', handleDragStart);
             div.addEventListener('dragend', handleDragEnd);
             div.addEventListener('dragover', handleDragOver);
             div.addEventListener('drop', handleDrop);
             
-            // Eventos de toque (mobile)
             div.addEventListener('touchstart', handleTouchStart, { passive: false });
             div.addEventListener('touchmove', handleTouchMove, { passive: false });
             div.addEventListener('touchend', handleTouchEnd);
         }
-        div.textContent = item.text;  // ← TEXTO DO VERBO
+        div.textContent = item.text || item.english || item.word || '?';
         englishList.appendChild(div);
     });
     
@@ -1567,11 +1697,10 @@ function renderVocabularyLists() {
             div.className = 'vocab-item portuguese-item';
             div.setAttribute('data-id', item.id);
         }
-        div.textContent = item.text;  // ← TEXTO DA TRADUÇÃO
+        div.textContent = item.text || item.portuguese || item.translation || '?';
         portugueseList.appendChild(div);
     });
     
-    // Limpa estilos visuais
     document.querySelectorAll('.english-item').forEach(item => {
         item.classList.remove('drag-over', 'dragging-source');
         item.style.opacity = '';
@@ -1580,8 +1709,6 @@ function renderVocabularyLists() {
         item.style.color = '';
     });
 }
-
-
 // ============================================
 // SUPORTE A TOQUE (MOBILE) - MESMO COMPORTAMENTO DO DESKTOP
 // ============================================
