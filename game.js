@@ -1536,25 +1536,104 @@ function renderVocabularyLists() {
         const div = document.createElement('div');
         if (item.locked) {
             div.className = 'vocab-item english-item locked';
-            div.setAttribute('draggable', 'false');
         } else {
             div.className = 'vocab-item english-item';
-            div.setAttribute('draggable', 'true');
             div.setAttribute('data-id', item.id);
             div.setAttribute('data-index', idx);
+            div.setAttribute('draggable', 'false'); // DESATIVA DRAG NATIVO
             
-            // Eventos de mouse (desktop)
-            div.addEventListener('dragstart', handleDragStart);
-            div.addEventListener('dragend', handleDragEnd);
-            div.addEventListener('dragover', handleDragOver);
-            div.addEventListener('drop', handleDrop);
+            // Texto do item
+            div.textContent = item.text;
             
-            // Eventos de toque (mobile)
-            div.addEventListener('touchstart', handleTouchStart, { passive: false });
-            div.addEventListener('touchmove', handleTouchMove, { passive: false });
-            div.addEventListener('touchend', handleTouchEnd);
+            // ADICIONA EVENTOS DE TOQUE DIRETAMENTE AQUI
+            div.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                this.style.opacity = '0.5';
+                this.style.backgroundColor = '#c9a13b';
+                this.style.transform = 'scale(0.98)';
+                window.draggedItem = this;
+                window.draggedId = item.id;
+                window.draggedIndex = idx;
+            }, { passive: false });
+            
+            div.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const elemUnderTouch = document.elementsFromPoint(touch.clientX, touch.clientY);
+                
+                // Remove highlight de todos
+                document.querySelectorAll('.portuguese-item').forEach(p => {
+                    p.classList.remove('drag-over');
+                });
+                
+                // Adiciona highlight no alvo português
+                for (let elem of elemUnderTouch) {
+                    if (elem.classList && elem.classList.contains('portuguese-item') && !elem.classList.contains('locked')) {
+                        elem.classList.add('drag-over');
+                        break;
+                    }
+                }
+            }, { passive: false });
+            
+            div.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                
+                // Restaura estilo
+                this.style.opacity = '';
+                this.style.backgroundColor = '';
+                this.style.transform = '';
+                
+                const touch = e.changedTouches[0];
+                const elemUnderTouch = document.elementsFromPoint(touch.clientX, touch.clientY);
+                let targetPortuguese = null;
+                
+                for (let elem of elemUnderTouch) {
+                    if (elem.classList && elem.classList.contains('portuguese-item') && !elem.classList.contains('locked')) {
+                        targetPortuguese = elem;
+                        break;
+                    }
+                }
+                
+                if (targetPortuguese && window.draggedId !== undefined) {
+                    const targetId = parseInt(targetPortuguese.getAttribute('data-id'));
+                    
+                    if (window.draggedId === targetId) {
+                        // Match correto!
+                        const englishItem = currentEnglishWords.find(i => i.id === window.draggedId && !i.locked);
+                        const portugueseItem = currentPortugueseWords.find(i => i.id === targetId && !i.locked);
+                        
+                        if (englishItem && portugueseItem) {
+                            englishItem.locked = true;
+                            portugueseItem.locked = true;
+                            matchesCount++;
+                            vocabMatchesSpan.textContent = matchesCount;
+                            showVocabMessage('✓ Correct match!', 'success');
+                            renderVocabularyLists();
+                            
+                            if (matchesCount === currentEnglishWords.length) {
+                                showVocabMessage('🎉 PERFECT! 🎉', 'win');
+                            }
+                        }
+                    } else {
+                        showVocabMessage('✗ Wrong match! Try again!', 'error');
+                    }
+                }
+                
+                // Limpa
+                document.querySelectorAll('.portuguese-item').forEach(p => {
+                    p.classList.remove('drag-over');
+                });
+                window.draggedItem = null;
+                window.draggedId = null;
+                window.draggedIndex = null;
+            });
         }
-        div.textContent = item.text;
+        
+        if (!item.locked) {
+            div.textContent = item.text;
+        } else {
+            div.textContent = item.text;
+        }
         englishList.appendChild(div);
     });
     
@@ -1565,89 +1644,11 @@ function renderVocabularyLists() {
             div.className = 'vocab-item portuguese-item locked';
         } else {
             div.className = 'vocab-item portuguese-item';
-            // Adiciona evento de toque para os alvos também
-            div.addEventListener('touchmove', handleTouchMove, { passive: false });
-            div.addEventListener('touchend', handleTouchEnd);
+            div.setAttribute('data-id', item.id);
         }
         div.textContent = item.text;
-        div.setAttribute('data-id', item.id);
         portugueseList.appendChild(div);
     });
-    
-    if (matchesCount === vocabularyData.length) {
-        showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
-    }
-}
-
-
-function handleDragStart(e) {
-    draggedElement = e.target;
-    draggedIndex = parseInt(draggedElement.getAttribute('data-index'));
-    e.target.style.opacity = '0.5';
-    e.dataTransfer.setData('text/plain', '');
-    e.dataTransfer.effectAllowed = 'move';
-}
-
-function handleDragEnd(e) {
-    if (draggedElement) draggedElement.style.opacity = '1';
-    document.querySelectorAll('.english-item').forEach(item => {
-        item.classList.remove('drag-over');
-    });
-    draggedElement = null;
-    draggedIndex = null;
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    const target = e.target.closest('.english-item');
-    if (target && target !== draggedElement && !target.classList.contains('locked')) {
-        document.querySelectorAll('.english-item').forEach(item => {
-            item.classList.remove('drag-over');
-        });
-        target.classList.add('drag-over');
-    }
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    const target = e.target.closest('.english-item');
-    if (!target || draggedElement === null || draggedIndex === null) return;
-    if (target.classList.contains('locked')) return;
-    
-    const targetIndex = parseInt(target.getAttribute('data-index'));
-    if (isNaN(targetIndex) || draggedIndex === targetIndex) return;
-    
-    const activeEnglish = currentEnglishWords.filter(item => !item.locked);
-    
-    let realDraggedIndex = -1;
-    let realTargetIndex = -1;
-    let filteredIndex = 0;
-    for (let i = 0; i < currentEnglishWords.length; i++) {
-        if (!currentEnglishWords[i].locked) {
-            if (i === draggedIndex) realDraggedIndex = filteredIndex;
-            if (i === targetIndex) realTargetIndex = filteredIndex;
-            filteredIndex++;
-        }
-    }
-    
-    if (realDraggedIndex === -1 || realTargetIndex === -1) return;
-    
-    const [movedItem] = activeEnglish.splice(realDraggedIndex, 1);
-    activeEnglish.splice(realTargetIndex, 0, movedItem);
-    
-    let activePos = 0;
-    for (let i = 0; i < currentEnglishWords.length; i++) {
-        if (!currentEnglishWords[i].locked) {
-            currentEnglishWords[i] = activeEnglish[activePos];
-            activePos++;
-        }
-    }
-    
-    renderVocabularyLists();
-    draggedElement = null;
-    draggedIndex = null;
-    checkAndLockMatches();
 }
 
 // ============================================
