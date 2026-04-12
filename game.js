@@ -1536,104 +1536,25 @@ function renderVocabularyLists() {
         const div = document.createElement('div');
         if (item.locked) {
             div.className = 'vocab-item english-item locked';
+            div.setAttribute('draggable', 'false');
         } else {
             div.className = 'vocab-item english-item';
             div.setAttribute('data-id', item.id);
             div.setAttribute('data-index', idx);
-            div.setAttribute('draggable', 'false'); // DESATIVA DRAG NATIVO
+            div.setAttribute('draggable', 'true');
             
-            // Texto do item
-            div.textContent = item.text;
+            // Eventos de mouse (desktop)
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+            div.addEventListener('dragover', handleDragOver);
+            div.addEventListener('drop', handleDrop);
             
-            // ADICIONA EVENTOS DE TOQUE DIRETAMENTE AQUI
-            div.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                this.style.opacity = '0.5';
-                this.style.backgroundColor = '#c9a13b';
-                this.style.transform = 'scale(0.98)';
-                window.draggedItem = this;
-                window.draggedId = item.id;
-                window.draggedIndex = idx;
-            }, { passive: false });
-            
-            div.addEventListener('touchmove', function(e) {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const elemUnderTouch = document.elementsFromPoint(touch.clientX, touch.clientY);
-                
-                // Remove highlight de todos
-                document.querySelectorAll('.portuguese-item').forEach(p => {
-                    p.classList.remove('drag-over');
-                });
-                
-                // Adiciona highlight no alvo português
-                for (let elem of elemUnderTouch) {
-                    if (elem.classList && elem.classList.contains('portuguese-item') && !elem.classList.contains('locked')) {
-                        elem.classList.add('drag-over');
-                        break;
-                    }
-                }
-            }, { passive: false });
-            
-            div.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                
-                // Restaura estilo
-                this.style.opacity = '';
-                this.style.backgroundColor = '';
-                this.style.transform = '';
-                
-                const touch = e.changedTouches[0];
-                const elemUnderTouch = document.elementsFromPoint(touch.clientX, touch.clientY);
-                let targetPortuguese = null;
-                
-                for (let elem of elemUnderTouch) {
-                    if (elem.classList && elem.classList.contains('portuguese-item') && !elem.classList.contains('locked')) {
-                        targetPortuguese = elem;
-                        break;
-                    }
-                }
-                
-                if (targetPortuguese && window.draggedId !== undefined) {
-                    const targetId = parseInt(targetPortuguese.getAttribute('data-id'));
-                    
-                    if (window.draggedId === targetId) {
-                        // Match correto!
-                        const englishItem = currentEnglishWords.find(i => i.id === window.draggedId && !i.locked);
-                        const portugueseItem = currentPortugueseWords.find(i => i.id === targetId && !i.locked);
-                        
-                        if (englishItem && portugueseItem) {
-                            englishItem.locked = true;
-                            portugueseItem.locked = true;
-                            matchesCount++;
-                            vocabMatchesSpan.textContent = matchesCount;
-                            showVocabMessage('✓ Correct match!', 'success');
-                            renderVocabularyLists();
-                            
-                            if (matchesCount === currentEnglishWords.length) {
-                                showVocabMessage('🎉 PERFECT! 🎉', 'win');
-                            }
-                        }
-                    } else {
-                        showVocabMessage('✗ Wrong match! Try again!', 'error');
-                    }
-                }
-                
-                // Limpa
-                document.querySelectorAll('.portuguese-item').forEach(p => {
-                    p.classList.remove('drag-over');
-                });
-                window.draggedItem = null;
-                window.draggedId = null;
-                window.draggedIndex = null;
-            });
+            // Eventos de toque (mobile) - APENAS PARA REORGANIZAR
+            div.addEventListener('touchstart', handleTouchStart, { passive: false });
+            div.addEventListener('touchmove', handleTouchMove, { passive: false });
+            div.addEventListener('touchend', handleTouchEnd);
         }
-        
-        if (!item.locked) {
-            div.textContent = item.text;
-        } else {
-            div.textContent = item.text;
-        }
+        div.textContent = item.text;
         englishList.appendChild(div);
     });
     
@@ -1648,6 +1569,15 @@ function renderVocabularyLists() {
         }
         div.textContent = item.text;
         portugueseList.appendChild(div);
+    });
+    
+    // Limpa estilos visuais
+    document.querySelectorAll('.english-item').forEach(item => {
+        item.classList.remove('drag-over', 'dragging-source');
+        item.style.opacity = '';
+        item.style.transform = '';
+        item.style.backgroundColor = '';
+        item.style.color = '';
     });
 }
 

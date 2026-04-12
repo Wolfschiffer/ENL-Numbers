@@ -1650,7 +1650,7 @@ body:not([data-screen="words"]) [data-words-only="true"] {
     }
 }
 
-/* Feedback visual durante drag */
+/* Feedback visual para drag and drop mobile */
 .english-item.drag-over {
     background: #c9a13b !important;
     color: white !important;
@@ -1659,31 +1659,11 @@ body:not([data-screen="words"]) [data-words-only="true"] {
     transition: all 0.1s ease;
 }
 
-/* Efeito no elemento sendo arrastado */
-.english-item.dragging-source {
-    opacity: 0.3;
-}
-
-/* ============================================ */
-/* FEEDBACK VISUAL PARA DRAG AND DROP MOBILE */
-/* ============================================ */
-
-/* Item sendo arrastado */
 .english-item.dragging-source {
     opacity: 0.5 !important;
     transform: scale(0.98) !important;
 }
 
-/* Item alvo durante o drag */
-.english-item.drag-over {
-    background: #c9a13b !important;
-    color: white !important;
-    border-color: #b38f32 !important;
-    transform: scale(1.02) !important;
-    transition: all 0.1s ease !important;
-}
-
-/* Garante que o clone do drag fique visível */
 body.dragging {
     overflow: hidden;
     position: fixed;
