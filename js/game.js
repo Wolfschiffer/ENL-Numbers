@@ -1386,10 +1386,7 @@ const PAST_AUDIO_MAP = {
     "was / were": "was_were"
 };
 
-let verbsAudioPlayer = null;
-
 function normalizeAudioFileName(text) {
-    // Remove acentos usando normalização Unicode
     const semAcentos = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     
     return semAcentos.toLowerCase()
@@ -1397,39 +1394,91 @@ function normalizeAudioFileName(text) {
         .replace(/[^a-z_]/g, '');
 }
 
-function playVerbAudio(text, context) {
-    if (isAudioMuted) return;
-    if (!text) return;
+// ============================================
+// CACHE DE ÁUDIO DO VERBS (COM CLONE)
+// ============================================
+
+const verbsAudioCache = new Map();
+let currentPlayingAudio = null;
+
+function resolveAudioPath(text, context) {
+    if (!text) return null;
     
     let fileName = null;
     
     if (context === 'english') {
         fileName = normalizeAudioFileName(text);
-    } 
-    else if (context === 'translation') {
+    } else if (context === 'translation') {
         fileName = TRANSLATION_AUDIO_MAP[text] || normalizeAudioFileName(text);
-    }
-    else if (context === 'past') {
+    } else if (context === 'past') {
         fileName = PAST_AUDIO_MAP[text] || normalizeAudioFileName(text);
     }
     
-    if (!fileName) return;
-    
-    const audioPath = `audio/${fileName}.mp3`;
-    
-    if (verbsAudioPlayer) {
-        verbsAudioPlayer.pause();
-        verbsAudioPlayer.currentTime = 0;
-    }
-    
-    verbsAudioPlayer = new Audio(audioPath);
-    verbsAudioPlayer.play().catch(err => {
-        console.warn(`🔊 Áudio não encontrado: ${audioPath}`);
-    });
+    if (!fileName) return null;
+    return `audio/${fileName}.mp3`;
 }
 
-// Função para criar botão de áudio com proteção contra drag
-// Função para criar botão de áudio com proteção MINIMAL contra drag
+function ensureAudioInCache(audioPath) {
+    if (!audioPath) return null;
+    
+    if (verbsAudioCache.has(audioPath)) {
+        return verbsAudioCache.get(audioPath);
+    }
+    
+    const audio = new Audio(audioPath);
+    audio.preload = 'auto';
+    verbsAudioCache.set(audioPath, audio);
+    
+    console.log(`📦 Áudio adicionado ao cache: ${audioPath}`);
+    return audio;
+}
+
+function playVerbAudio(text, context) {
+    if (isAudioMuted) return;
+    
+    const audioPath = resolveAudioPath(text, context);
+    if (!audioPath) return;
+    
+    const cachedAudio = ensureAudioInCache(audioPath);
+    if (!cachedAudio) return;
+    
+    if (currentPlayingAudio) {
+        currentPlayingAudio.pause();
+        currentPlayingAudio.currentTime = 0;
+    }
+    
+    const playInstance = cachedAudio.cloneNode();
+    playInstance.play().catch(err => {
+        console.warn(`🔊 Erro ao tocar: ${audioPath}`, err);
+    });
+    
+    currentPlayingAudio = playInstance;
+}
+
+function preloadCurrentGameAudios() {
+    verbsAudioCache.clear();
+    
+    const englishTexts = currentEnglishWords.map(item => item.text);
+    const portugueseTexts = currentPortugueseWords.map(item => item.text);
+    
+    const preloadItems = [
+        ...englishTexts.map(text => ({ text, context: 'english' })),
+        ...portugueseTexts.map(text => ({ 
+            text,
+            context: currentVerbGameType === 'past' ? 'past' : 'translation'
+        }))
+    ];
+    
+    preloadItems.forEach(({ text, context }) => {
+        const audioPath = resolveAudioPath(text, context);
+        if (audioPath) {
+            ensureAudioInCache(audioPath);
+        }
+    });
+    
+    console.log(`📦 Pré-carregamento concluído. Cache size: ${verbsAudioCache.size}`);
+}
+
 function createAudioButton(text, context, position = 'left') {
     const btn = document.createElement('button');
     btn.className = `vocab-audio-btn ${position}`;
@@ -1640,6 +1689,8 @@ function startVocabularyGame(vocabularyDataParam = null, gameType = 'present') {
     renderVocabularyLists();
     if (vocabMessage) vocabMessage.innerHTML = '';
     currentScreen = SCREENS.WORDS_GAME;
+
+	preloadCurrentGameAudios();
 }
 
 
@@ -2244,296 +2295,272 @@ function updateGameUserName() {
 
 
 // ============================================
-// DADOS DOS JOGOS DE VOCABULÁRIO
+// VERBS — SIMPLE VERBS (ENGLISH -> PORTUGUESE)
 // ============================================
 
-// Simple Verbs 1 (já existe, mas vamos atualizar)
 const vocabularyDataVerbs1 = [
+    { id: 0, english: "to work", portuguese: "trabalhar" },
+    { id: 1, english: "to ask", portuguese: "perguntar" },
+    { id: 2, english: "to play", portuguese: "jogar" },
+    { id: 3, english: "to open", portuguese: "abrir" },
+    { id: 4, english: "to help", portuguese: "ajudar" },
+    { id: 5, english: "to look", portuguese: "olhar" },
+    { id: 6, english: "to want", portuguese: "querer" },
+    { id: 7, english: "to seem", portuguese: "parecer" },
+    { id: 8, english: "to call", portuguese: "chamar / ligar" },
+    { id: 9, english: "to talk", portuguese: "conversar / falar" }
+];
+
+const vocabularyDataVerbs2 = [
+    { id: 0, english: "to turn", portuguese: "virar" },
+    { id: 1, english: "to start", portuguese: "começar" },
+    { id: 2, english: "to show", portuguese: "mostrar" },
+    { id: 3, english: "to happen", portuguese: "acontecer" },
+    { id: 4, english: "to learn", portuguese: "aprender" },
+    { id: 5, english: "to watch", portuguese: "assistir / observar" },
+    { id: 6, english: "to follow", portuguese: "seguir" },
+    { id: 7, english: "to allow", portuguese: "permitir" },
+    { id: 8, english: "to add", portuguese: "adicionar" },
+    { id: 9, english: "to walk", portuguese: "caminhar" }
+];
+
+const vocabularyDataVerbs3 = [
+    { id: 0, english: "to offer", portuguese: "oferecer" },
+    { id: 1, english: "to remember", portuguese: "lembrar" },
+    { id: 2, english: "to consider", portuguese: "considerar" },
+    { id: 3, english: "to appear", portuguese: "aparecer" },
+    { id: 4, english: "to wait", portuguese: "esperar / aguardar" },
+    { id: 5, english: "to serve", portuguese: "servir" },
+    { id: 6, english: "to expect", portuguese: "esperar" },
+    { id: 7, english: "to stay", portuguese: "ficar / permanecer" },
+    { id: 8, english: "to reach", portuguese: "alcançar" },
+    { id: 9, english: "to kill", portuguese: "matar" }
+];
+
+const vocabularyDataVerbs4 = [
+    { id: 0, english: "to use", portuguese: "usar" },
+    { id: 1, english: "to move", portuguese: "mover" },
+    { id: 2, english: "to live", portuguese: "viver / morar" },
+    { id: 3, english: "to believe", portuguese: "acreditar" },
+    { id: 4, english: "to provide", portuguese: "fornecer" },
+    { id: 5, english: "to include", portuguese: "incluir" },
+    { id: 6, english: "to continue", portuguese: "continuar" },
+    { id: 7, english: "to change", portuguese: "mudar" },
+    { id: 8, english: "to create", portuguese: "criar" },
+    { id: 9, english: "to love", portuguese: "amar" }
+];
+
+const vocabularyDataVerbs5 = [
+    { id: 0, english: "to try", portuguese: "tentar" },
+    { id: 1, english: "to carry", portuguese: "carregar / levar" },
+    { id: 2, english: "to study", portuguese: "estudar" },
+    { id: 3, english: "to worry", portuguese: "preocupar-se" },
+    { id: 4, english: "to cry", portuguese: "chorar" },
+    { id: 5, english: "to copy", portuguese: "copiar" },
+    { id: 6, english: "to marry", portuguese: "casar" },
+    { id: 7, english: "to hurry", portuguese: "apressar-se" },
+    { id: 8, english: "to dry", portuguese: "secar" },
+    { id: 9, english: "to reply", portuguese: "responder" }
+];
+
+const vocabularyDataVerbs6 = [
+    { id: 0, english: "to stop", portuguese: "parar" },
+    { id: 1, english: "to plan", portuguese: "planejar" },
+    { id: 2, english: "to drop", portuguese: "derrubar / deixar cair" },
+    { id: 3, english: "to chat", portuguese: "conversar" },
+    { id: 4, english: "to rob", portuguese: "roubar" },
+    { id: 5, english: "to clap", portuguese: "aplaudir" },
+    { id: 6, english: "to hug", portuguese: "abraçar" },
+    { id: 7, english: "to grab", portuguese: "agarrar" },
+    { id: 8, english: "to nod", portuguese: "acenar" },
+    { id: 9, english: "to skip", portuguese: "pular" }
+];
+
+const vocabularyDataVerbs7 = [
     { id: 0, english: "to go", portuguese: "ir" },
     { id: 1, english: "to read", portuguese: "ler" },
-    { id: 2, english: "to work", portuguese: "trabalhar" },
-    { id: 3, english: "to tell", portuguese: "contar / dizer" },
-    { id: 4, english: "to ask", portuguese: "perguntar" },
-    { id: 5, english: "to play", portuguese: "jogar" },
-    { id: 6, english: "to try", portuguese: "tentar" },
-    { id: 7, english: "to open", portuguese: "abrir" },
-    { id: 8, english: "to help", portuguese: "ajudar" },
-    { id: 9, english: "to run", portuguese: "correr" }
+    { id: 2, english: "to tell", portuguese: "contar / dizer" },
+    { id: 3, english: "to run", portuguese: "correr" },
+    { id: 4, english: "to be", portuguese: "ser / estar" },
+    { id: 5, english: "to have", portuguese: "ter" },
+    { id: 6, english: "to do", portuguese: "fazer" },
+    { id: 7, english: "to say", portuguese: "dizer" },
+    { id: 8, english: "to get", portuguese: "conseguir / obter" },
+    { id: 9, english: "to make", portuguese: "fazer / criar" }
 ];
 
-// Simple Verbs 2
-const vocabularyDataVerbs2 = [
-    { id: 0, english: "to be", portuguese: "ser / estar" },
-    { id: 1, english: "to have", portuguese: "ter" },
-    { id: 2, english: "to do", portuguese: "fazer" },
-    { id: 3, english: "to say", portuguese: "dizer" },
-    { id: 4, english: "to get", portuguese: "conseguir / obter" },
-    { id: 5, english: "to make", portuguese: "fazer / criar" },
-    { id: 6, english: "to know", portuguese: "saber / conhecer" },
-    { id: 7, english: "to take", portuguese: "pegar / levar" },
-    { id: 8, english: "to see", portuguese: "ver" },
-    { id: 9, english: "to come", portuguese: "vir" }
-];
-
-// Simple Verbs 3
-const vocabularyDataVerbs3 = [
-    { id: 0, english: "to think", portuguese: "pensar" },
-    { id: 1, english: "to look", portuguese: "olhar" },
-    { id: 2, english: "to want", portuguese: "querer" },
-    { id: 3, english: "to give", portuguese: "dar" },
-    { id: 4, english: "to use", portuguese: "usar" },
-    { id: 5, english: "to find", portuguese: "encontrar" },
-    { id: 6, english: "to seem", portuguese: "parecer" },
+const vocabularyDataVerbs8 = [
+    { id: 0, english: "to know", portuguese: "saber / conhecer" },
+    { id: 1, english: "to take", portuguese: "pegar / levar" },
+    { id: 2, english: "to see", portuguese: "ver" },
+    { id: 3, english: "to come", portuguese: "vir" },
+    { id: 4, english: "to think", portuguese: "pensar" },
+    { id: 5, english: "to give", portuguese: "dar" },
+    { id: 6, english: "to find", portuguese: "encontrar" },
     { id: 7, english: "to feel", portuguese: "sentir" },
     { id: 8, english: "to leave", portuguese: "deixar / sair" },
-    { id: 9, english: "to call", portuguese: "chamar / ligar" }
+    { id: 9, english: "to put", portuguese: "colocar" }
 ];
 
-// Simple Verbs 4
-const vocabularyDataVerbs4 = [
-    { id: 0, english: "to put", portuguese: "colocar" },
-    { id: 1, english: "to keep", portuguese: "manter" },
-    { id: 2, english: "to let", portuguese: "deixar / permitir" },
-    { id: 3, english: "to begin", portuguese: "começar" },
-    { id: 4, english: "to talk", portuguese: "conversar / falar" },
-    { id: 5, english: "to turn", portuguese: "virar" },
-    { id: 6, english: "to start", portuguese: "iniciar" },
-    { id: 7, english: "to show", portuguese: "mostrar" },
-    { id: 8, english: "to hear", portuguese: "ouvir" },
-    { id: 9, english: "to move", portuguese: "mover" }
-];
-
-// Simple Verbs 5
-const vocabularyDataVerbs5 = [
-    { id: 0, english: "to live", portuguese: "viver / morar" },
-    { id: 1, english: "to believe", portuguese: "acreditar" },
-    { id: 2, english: "to bring", portuguese: "trazer" },
-    { id: 3, english: "to happen", portuguese: "acontecer" },
-    { id: 4, english: "to write", portuguese: "escrever" },
-    { id: 5, english: "to provide", portuguese: "fornecer" },
+const vocabularyDataVerbs9 = [
+    { id: 0, english: "to keep", portuguese: "manter" },
+    { id: 1, english: "to let", portuguese: "deixar / permitir" },
+    { id: 2, english: "to begin", portuguese: "começar" },
+    { id: 3, english: "to hear", portuguese: "ouvir" },
+    { id: 4, english: "to bring", portuguese: "trazer" },
+    { id: 5, english: "to write", portuguese: "escrever" },
     { id: 6, english: "to sit", portuguese: "sentar" },
     { id: 7, english: "to stand", portuguese: "ficar em pé" },
     { id: 8, english: "to lose", portuguese: "perder" },
     { id: 9, english: "to pay", portuguese: "pagar" }
 ];
 
-// Simple Verbs 6
-const vocabularyDataVerbs6 = [
+const vocabularyDataVerbs10 = [
     { id: 0, english: "to meet", portuguese: "encontrar / conhecer" },
-    { id: 1, english: "to include", portuguese: "incluir" },
-    { id: 2, english: "to continue", portuguese: "continuar" },
-    { id: 3, english: "to set", portuguese: "definir / colocar" },
-    { id: 4, english: "to learn", portuguese: "aprender" },
-    { id: 5, english: "to change", portuguese: "mudar" },
-    { id: 6, english: "to lead", portuguese: "liderar" },
-    { id: 7, english: "to understand", portuguese: "entender" },
-    { id: 8, english: "to watch", portuguese: "assistir / observar" },
-    { id: 9, english: "to follow", portuguese: "seguir" }
-];
-
-// Simple Verbs 7
-const vocabularyDataVerbs7 = [
-    { id: 0, english: "to stop", portuguese: "parar" },
-    { id: 1, english: "to create", portuguese: "criar" },
-    { id: 2, english: "to speak", portuguese: "falar" },
-    { id: 3, english: "to allow", portuguese: "permitir" },
-    { id: 4, english: "to add", portuguese: "adicionar" },
+    { id: 1, english: "to set", portuguese: "definir / colocar" },
+    { id: 2, english: "to lead", portuguese: "liderar" },
+    { id: 3, english: "to understand", portuguese: "entender" },
+    { id: 4, english: "to speak", portuguese: "falar" },
     { id: 5, english: "to spend", portuguese: "gastar" },
     { id: 6, english: "to grow", portuguese: "crescer" },
-    { id: 7, english: "to walk", portuguese: "caminhar" },
-    { id: 8, english: "to win", portuguese: "ganhar / vencer" },
-    { id: 9, english: "to offer", portuguese: "oferecer" }
+    { id: 7, english: "to win", portuguese: "ganhar / vencer" },
+    { id: 8, english: "to buy", portuguese: "comprar" },
+    { id: 9, english: "to send", portuguese: "enviar" }
 ];
-
-// Simple Verbs 8
-const vocabularyDataVerbs8 = [
-    { id: 0, english: "to remember", portuguese: "lembrar" },
-    { id: 1, english: "to love", portuguese: "amar" },
-    { id: 2, english: "to consider", portuguese: "considerar" },
-    { id: 3, english: "to appear", portuguese: "aparecer" },
-    { id: 4, english: "to buy", portuguese: "comprar" },
-    { id: 5, english: "to wait", portuguese: "esperar" },
-    { id: 6, english: "to serve", portuguese: "servir" },
-    { id: 7, english: "to die", portuguese: "morrer" },
-    { id: 8, english: "to send", portuguese: "enviar" },
-    { id: 9, english: "to expect", portuguese: "esperar / aguardar" }
-];
-
-// Simple Verbs 9
-const vocabularyDataVerbs9 = [
-    { id: 0, english: "to build", portuguese: "construir" },
-    { id: 1, english: "to stay", portuguese: "ficar / permanecer" },
-    { id: 2, english: "to fall", portuguese: "cair" },
-    { id: 3, english: "to cut", portuguese: "cortar" },
-    { id: 4, english: "to reach", portuguese: "alcançar" },
-    { id: 5, english: "to kill", portuguese: "matar" },
-    { id: 6, english: "to remain", portuguese: "permanecer" },
-    { id: 7, english: "to suggest", portuguese: "sugerir" },
-    { id: 8, english: "to raise", portuguese: "levantar / aumentar" },
-    { id: 9, english: "to pass", portuguese: "passar" }
-];
-
-// Simple Verbs 10
-const vocabularyDataVerbs10 = [
-    { id: 0, english: "to sell", portuguese: "vender" },
-    { id: 1, english: "to require", portuguese: "exigir" },
-    { id: 2, english: "to report", portuguese: "relatar" },
-    { id: 3, english: "to decide", portuguese: "decidir" },
-    { id: 4, english: "to pull", portuguese: "puxar" },
-    { id: 5, english: "to return", portuguese: "retornar" },
-    { id: 6, english: "to explain", portuguese: "explicar" },
-    { id: 7, english: "to hope", portuguese: "esperar / ter esperança" },
-    { id: 8, english: "to develop", portuguese: "desenvolver" },
-    { id: 9, english: "to carry", portuguese: "carregar / levar" }
-];
-
 
 // ============================================
-// DADOS DOS JOGOS DE VOCABULÁRIO - PAST TENSE
+// VERBS — SIMPLE PAST (ENGLISH -> PAST)
 // ============================================
 
-// Simple Past 1
 const vocabularyDataPast1 = [
-    { id: 0, english: "to be", portuguese: "was / were" },
-    { id: 1, english: "to have", portuguese: "had" },
-    { id: 2, english: "to do", portuguese: "did" },
-    { id: 3, english: "to say", portuguese: "said" },
-    { id: 4, english: "to get", portuguese: "got" },
-    { id: 5, english: "to make", portuguese: "made" },
-    { id: 6, english: "to know", portuguese: "knew" },
-    { id: 7, english: "to take", portuguese: "took" },
-    { id: 8, english: "to see", portuguese: "saw" },
-    { id: 9, english: "to come", portuguese: "came" }
+    { id: 0, english: "to work", portuguese: "worked" },
+    { id: 1, english: "to ask", portuguese: "asked" },
+    { id: 2, english: "to play", portuguese: "played" },
+    { id: 3, english: "to open", portuguese: "opened" },
+    { id: 4, english: "to help", portuguese: "helped" },
+    { id: 5, english: "to look", portuguese: "looked" },
+    { id: 6, english: "to want", portuguese: "wanted" },
+    { id: 7, english: "to seem", portuguese: "seemed" },
+    { id: 8, english: "to call", portuguese: "called" },
+    { id: 9, english: "to talk", portuguese: "talked" }
 ];
 
-// Simple Past 2
 const vocabularyDataPast2 = [
+    { id: 0, english: "to turn", portuguese: "turned" },
+    { id: 1, english: "to start", portuguese: "started" },
+    { id: 2, english: "to show", portuguese: "showed" },
+    { id: 3, english: "to happen", portuguese: "happened" },
+    { id: 4, english: "to learn", portuguese: "learned" },
+    { id: 5, english: "to watch", portuguese: "watched" },
+    { id: 6, english: "to follow", portuguese: "followed" },
+    { id: 7, english: "to allow", portuguese: "allowed" },
+    { id: 8, english: "to add", portuguese: "added" },
+    { id: 9, english: "to walk", portuguese: "walked" }
+];
+
+const vocabularyDataPast3 = [
+    { id: 0, english: "to offer", portuguese: "offered" },
+    { id: 1, english: "to remember", portuguese: "remembered" },
+    { id: 2, english: "to consider", portuguese: "considered" },
+    { id: 3, english: "to appear", portuguese: "appeared" },
+    { id: 4, english: "to wait", portuguese: "waited" },
+    { id: 5, english: "to serve", portuguese: "served" },
+    { id: 6, english: "to expect", portuguese: "expected" },
+    { id: 7, english: "to stay", portuguese: "stayed" },
+    { id: 8, english: "to reach", portuguese: "reached" },
+    { id: 9, english: "to kill", portuguese: "killed" }
+];
+
+const vocabularyDataPast4 = [
+    { id: 0, english: "to use", portuguese: "used" },
+    { id: 1, english: "to move", portuguese: "moved" },
+    { id: 2, english: "to live", portuguese: "lived" },
+    { id: 3, english: "to believe", portuguese: "believed" },
+    { id: 4, english: "to provide", portuguese: "provided" },
+    { id: 5, english: "to include", portuguese: "included" },
+    { id: 6, english: "to continue", portuguese: "continued" },
+    { id: 7, english: "to change", portuguese: "changed" },
+    { id: 8, english: "to create", portuguese: "created" },
+    { id: 9, english: "to love", portuguese: "loved" }
+];
+
+const vocabularyDataPast5 = [
+    { id: 0, english: "to try", portuguese: "tried" },
+    { id: 1, english: "to carry", portuguese: "carried" },
+    { id: 2, english: "to study", portuguese: "studied" },
+    { id: 3, english: "to worry", portuguese: "worried" },
+    { id: 4, english: "to cry", portuguese: "cried" },
+    { id: 5, english: "to copy", portuguese: "copied" },
+    { id: 6, english: "to marry", portuguese: "married" },
+    { id: 7, english: "to hurry", portuguese: "hurried" },
+    { id: 8, english: "to dry", portuguese: "dried" },
+    { id: 9, english: "to reply", portuguese: "replied" }
+];
+
+const vocabularyDataPast6 = [
+    { id: 0, english: "to stop", portuguese: "stopped" },
+    { id: 1, english: "to plan", portuguese: "planned" },
+    { id: 2, english: "to drop", portuguese: "dropped" },
+    { id: 3, english: "to chat", portuguese: "chatted" },
+    { id: 4, english: "to rob", portuguese: "robbed" },
+    { id: 5, english: "to clap", portuguese: "clapped" },
+    { id: 6, english: "to hug", portuguese: "hugged" },
+    { id: 7, english: "to grab", portuguese: "grabbed" },
+    { id: 8, english: "to nod", portuguese: "nodded" },
+    { id: 9, english: "to skip", portuguese: "skipped" }
+];
+
+const vocabularyDataPast7 = [
     { id: 0, english: "to go", portuguese: "went" },
     { id: 1, english: "to read", portuguese: "read" },
-    { id: 2, english: "to work", portuguese: "worked" },
-    { id: 3, english: "to tell", portuguese: "told" },
-    { id: 4, english: "to ask", portuguese: "asked" },
-    { id: 5, english: "to play", portuguese: "played" },
-    { id: 6, english: "to try", portuguese: "tried" },
-    { id: 7, english: "to open", portuguese: "opened" },
-    { id: 8, english: "to help", portuguese: "helped" },
-    { id: 9, english: "to run", portuguese: "ran" }
+    { id: 2, english: "to tell", portuguese: "told" },
+    { id: 3, english: "to run", portuguese: "ran" },
+    { id: 4, english: "to be", portuguese: "was / were" },
+    { id: 5, english: "to have", portuguese: "had" },
+    { id: 6, english: "to do", portuguese: "did" },
+    { id: 7, english: "to say", portuguese: "said" },
+    { id: 8, english: "to get", portuguese: "got" },
+    { id: 9, english: "to make", portuguese: "made" }
 ];
 
-// Simple Past 3
-const vocabularyDataPast3 = [
-    { id: 0, english: "to think", portuguese: "thought" },
-    { id: 1, english: "to look", portuguese: "looked" },
-    { id: 2, english: "to want", portuguese: "wanted" },
-    { id: 3, english: "to give", portuguese: "gave" },
-    { id: 4, english: "to use", portuguese: "used" },
-    { id: 5, english: "to find", portuguese: "found" },
-    { id: 6, english: "to seem", portuguese: "seemed" },
+const vocabularyDataPast8 = [
+    { id: 0, english: "to know", portuguese: "knew" },
+    { id: 1, english: "to take", portuguese: "took" },
+    { id: 2, english: "to see", portuguese: "saw" },
+    { id: 3, english: "to come", portuguese: "came" },
+    { id: 4, english: "to think", portuguese: "thought" },
+    { id: 5, english: "to give", portuguese: "gave" },
+    { id: 6, english: "to find", portuguese: "found" },
     { id: 7, english: "to feel", portuguese: "felt" },
     { id: 8, english: "to leave", portuguese: "left" },
-    { id: 9, english: "to call", portuguese: "called" }
+    { id: 9, english: "to put", portuguese: "put" }
 ];
 
-// Simple Past 4
-const vocabularyDataPast4 = [
-    { id: 0, english: "to put", portuguese: "put" },
-    { id: 1, english: "to keep", portuguese: "kept" },
-    { id: 2, english: "to let", portuguese: "let" },
-    { id: 3, english: "to begin", portuguese: "began" },
-    { id: 4, english: "to talk", portuguese: "talked" },
-    { id: 5, english: "to turn", portuguese: "turned" },
-    { id: 6, english: "to start", portuguese: "started" },
-    { id: 7, english: "to show", portuguese: "showed" },
-    { id: 8, english: "to hear", portuguese: "heard" },
-    { id: 9, english: "to move", portuguese: "moved" }
-];
-
-// Simple Past 5
-const vocabularyDataPast5 = [
-    { id: 0, english: "to live", portuguese: "lived" },
-    { id: 1, english: "to believe", portuguese: "believed" },
-    { id: 2, english: "to bring", portuguese: "brought" },
-    { id: 3, english: "to happen", portuguese: "happened" },
-    { id: 4, english: "to write", portuguese: "wrote" },
-    { id: 5, english: "to provide", portuguese: "provided" },
+const vocabularyDataPast9 = [
+    { id: 0, english: "to keep", portuguese: "kept" },
+    { id: 1, english: "to let", portuguese: "let" },
+    { id: 2, english: "to begin", portuguese: "began" },
+    { id: 3, english: "to hear", portuguese: "heard" },
+    { id: 4, english: "to bring", portuguese: "brought" },
+    { id: 5, english: "to write", portuguese: "wrote" },
     { id: 6, english: "to sit", portuguese: "sat" },
     { id: 7, english: "to stand", portuguese: "stood" },
     { id: 8, english: "to lose", portuguese: "lost" },
     { id: 9, english: "to pay", portuguese: "paid" }
 ];
 
-// Simple Past 6
-const vocabularyDataPast6 = [
+const vocabularyDataPast10 = [
     { id: 0, english: "to meet", portuguese: "met" },
-    { id: 1, english: "to include", portuguese: "included" },
-    { id: 2, english: "to continue", portuguese: "continued" },
-    { id: 3, english: "to set", portuguese: "set" },
-    { id: 4, english: "to learn", portuguese: "learned" },
-    { id: 5, english: "to change", portuguese: "changed" },
-    { id: 6, english: "to lead", portuguese: "led" },
-    { id: 7, english: "to understand", portuguese: "understood" },
-    { id: 8, english: "to watch", portuguese: "watched" },
-    { id: 9, english: "to follow", portuguese: "followed" }
-];
-
-// Simple Past 7
-const vocabularyDataPast7 = [
-    { id: 0, english: "to stop", portuguese: "stopped" },
-    { id: 1, english: "to create", portuguese: "created" },
-    { id: 2, english: "to speak", portuguese: "spoke" },
-    { id: 3, english: "to allow", portuguese: "allowed" },
-    { id: 4, english: "to add", portuguese: "added" },
+    { id: 1, english: "to set", portuguese: "set" },
+    { id: 2, english: "to lead", portuguese: "led" },
+    { id: 3, english: "to understand", portuguese: "understood" },
+    { id: 4, english: "to speak", portuguese: "spoke" },
     { id: 5, english: "to spend", portuguese: "spent" },
     { id: 6, english: "to grow", portuguese: "grew" },
-    { id: 7, english: "to walk", portuguese: "walked" },
-    { id: 8, english: "to win", portuguese: "won" },
-    { id: 9, english: "to offer", portuguese: "offered" }
+    { id: 7, english: "to win", portuguese: "won" },
+    { id: 8, english: "to buy", portuguese: "bought" },
+    { id: 9, english: "to send", portuguese: "sent" }
 ];
-
-// Simple Past 8
-const vocabularyDataPast8 = [
-    { id: 0, english: "to remember", portuguese: "remembered" },
-    { id: 1, english: "to love", portuguese: "loved" },
-    { id: 2, english: "to consider", portuguese: "considered" },
-    { id: 3, english: "to appear", portuguese: "appeared" },
-    { id: 4, english: "to buy", portuguese: "bought" },
-    { id: 5, english: "to wait", portuguese: "waited" },
-    { id: 6, english: "to serve", portuguese: "served" },
-    { id: 7, english: "to die", portuguese: "died" },
-    { id: 8, english: "to send", portuguese: "sent" },
-    { id: 9, english: "to expect", portuguese: "expected" }
-];
-
-// Simple Past 9
-const vocabularyDataPast9 = [
-    { id: 0, english: "to build", portuguese: "built" },
-    { id: 1, english: "to stay", portuguese: "stayed" },
-    { id: 2, english: "to fall", portuguese: "fell" },
-    { id: 3, english: "to cut", portuguese: "cut" },
-    { id: 4, english: "to reach", portuguese: "reached" },
-    { id: 5, english: "to kill", portuguese: "killed" },
-    { id: 6, english: "to remain", portuguese: "remained" },
-    { id: 7, english: "to suggest", portuguese: "suggested" },
-    { id: 8, english: "to raise", portuguese: "raised" },
-    { id: 9, english: "to pass", portuguese: "passed" }
-];
-
-// Simple Past 10
-const vocabularyDataPast10 = [
-    { id: 0, english: "to sell", portuguese: "sold" },
-    { id: 1, english: "to require", portuguese: "required" },
-    { id: 2, english: "to report", portuguese: "reported" },
-    { id: 3, english: "to decide", portuguese: "decided" },
-    { id: 4, english: "to pull", portuguese: "pulled" },
-    { id: 5, english: "to return", portuguese: "returned" },
-    { id: 6, english: "to explain", portuguese: "explained" },
-    { id: 7, english: "to hope", portuguese: "hoped" },
-    { id: 8, english: "to develop", portuguese: "developed" },
-    { id: 9, english: "to carry", portuguese: "carried" }
-];
-
-
-
 // ============================================
 // SUBMENU DOS SIMPLE VERBS
 // ============================================

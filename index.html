@@ -913,7 +913,8 @@ if (!window.navigation) {
   </div>
 
   <div class="menu-content">
-<div class="eagle-menu-icon" id="words-eagle-icon"></div>
+<div class="eagle-menu-icon" id="numbers-eagle-icon"></div>
+
 
     <h2 class="menu-title">Choose a Game</h2>
     <div class="game-cards">
@@ -961,103 +962,160 @@ if (!window.navigation) {
       <span class="category-badge">10 games available</span>
     </div>
     
+<div class="category-card" id="simple-verbs-past-btn" style="margin: 0 auto 20px auto; max-width: 300px; cursor: pointer;" data-words-only="true">
+  <div class="category-icon">⏪</div>
+  <h2>SIMPLE VERBS PAST TENSE</h2>
+  <p>100 essential verbs in past tense</p>
+  <span class="category-badge">10 games available</span>
+</div>
+
     <!-- Submenu dos Simple Verbs (inicialmente escondido) -->
     <div id="simple-verbs-submenu" style="display: none;">
       <div class="game-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px;">
-        <div class="game-card" onclick="selectWordGame('verbs1')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 1</h3>
-          <p>go, read, work, tell...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs2')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 2</h3>
-          <p>be, have, do, say...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs3')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 3</h3>
-          <p>think, look, want, give...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs4')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 4</h3>
-          <p>put, keep, let, begin...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs5')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 5</h3>
-          <p>live, believe, bring...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs6')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 6</h3>
-          <p>meet, include, continue...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs7')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 7</h3>
-          <p>stop, create, speak...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs8')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 8</h3>
-          <p>remember, love, consider...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs9')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 9</h3>
-          <p>build, stay, fall, cut...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-        
-        <div class="game-card" onclick="selectWordGame('verbs10')">
-          <div class="card-icon">📚</div>
-          <h3>Simple Verbs 10</h3>
-          <p>sell, require, report...</p>
-          <div class="best-score">Best: <span class="best-score-value">0</span></div>
-        </div>
-      </div>
+    <div class="game-card" onclick="selectWordGame('verbs1')">
+        <div class="card-icon">📚</div>
+        <h3>Simple Verbs 1</h3>
+        <p>Everyday verbs</p>
+        <span class="card-badge easy">Easy</span>
     </div>
 
+    <div class="game-card" onclick="selectWordGame('verbs2')">
+        <div class="card-icon">📚</div>
+        <h3>Simple Verbs 2</h3>
+        <p>Everyday verbs</p>
+        <span class="card-badge easy">Easy</span>
+    </div>
 
-<!-- Botão para Simple Verbs Past Tense -->
-<div class="category-card" id="simple-verbs-past-btn" style="margin: 20px auto 20px auto; max-width: 300px; cursor: pointer;" data-words-only="true">
-    <div class="category-icon">📚⏪</div>
-    <h2>SIMPLE VERBS PAST TENSE</h2>
-    <p>100 essential verbs in past tense</p>
-    <span class="category-badge">10 games available</span>
+    <div class="game-card" onclick="selectWordGame('verbs3')">
+        <div class="card-icon">📚</div>
+        <h3>Simple Verbs 3</h3>
+        <p>Common verbs</p>
+        <span class="card-badge medium">Medium</span>
+    </div>
+
+    <div class="game-card" onclick="selectWordGame('verbs4')">
+        <div class="card-icon">📚</div>
+        <h3>Simple Verbs 4</h3>
+        <p>Common verbs</p>
+        <span class="card-badge easy">Easy</span>
+    </div>
+
+    <div class="game-card" onclick="selectWordGame('verbs5')">
+        <div class="card-icon">📚</div>
+        <h3>Simple Verbs 5</h3>
+        <p>Common verbs</p>
+        <span class="card-badge medium">Medium</span>
+    </div>
+
+    <div class="game-card" onclick="selectWordGame('verbs6')">
+        <div class="card-icon">📚</div>
+        <h3>Simple Verbs 6</h3>
+        <p>Common verbs</p>
+        <span class="card-badge medium">Medium</span>
+    </div>
+
+    <div class="game-card" onclick="selectWordGame('verbs7')">
+        <div class="card-icon">⭐</div>
+        <h3>Simple Verbs 7</h3>
+        <p>Core verbs</p>
+        <span class="card-badge medium">Medium</span>
+    </div>
+
+    <div class="game-card" onclick="selectWordGame('verbs8')">
+        <div class="card-icon">⭐</div>
+        <h3>Simple Verbs 8</h3>
+        <p>Core verbs</p>
+        <span class="card-badge medium">Medium</span>
+    </div>
+
+    <div class="game-card" onclick="selectWordGame('verbs9')">
+        <div class="card-icon">⭐</div>
+        <h3>Simple Verbs 9</h3>
+        <p>Core verbs</p>
+        <span class="card-badge hard">Hard</span>
+    </div>
+
+    <div class="game-card" onclick="selectWordGame('verbs10')">
+        <div class="card-icon">⭐</div>
+        <h3>Simple Verbs 10</h3>
+        <p>Core verbs</p>
+        <span class="card-badge hard">Hard</span>
+    </div>
+  </div>
 </div>
 
-<!-- Submenu dos Simple Verbs Past Tense (inicialmente escondido) -->
+
 <div id="simple-verbs-past-submenu" style="display: none;">
     <div class="game-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px;">
-        <div class="game-card" onclick="selectWordGame('past1')"><div class="card-icon">📚</div><h3>Simple Past 1</h3><p>be, have, do, say...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past2')"><div class="card-icon">📚</div><h3>Simple Past 2</h3><p>go, know, take, see...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past3')"><div class="card-icon">📚</div><h3>Simple Past 3</h3><p>think, look, want, give...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past4')"><div class="card-icon">📚</div><h3>Simple Past 4</h3><p>put, keep, let, begin...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past5')"><div class="card-icon">📚</div><h3>Simple Past 5</h3><p>live, believe, bring...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past6')"><div class="card-icon">📚</div><h3>Simple Past 6</h3><p>meet, include, continue...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past7')"><div class="card-icon">📚</div><h3>Simple Past 7</h3><p>stop, create, speak...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past8')"><div class="card-icon">📚</div><h3>Simple Past 8</h3><p>remember, love, consider...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past9')"><div class="card-icon">📚</div><h3>Simple Past 9</h3><p>build, stay, fall, cut...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
-        <div class="game-card" onclick="selectWordGame('past10')"><div class="card-icon">📚</div><h3>Simple Past 10</h3><p>sell, require, report...</p><div class="best-score">Best: <span class="best-score-value">0</span></div></div>
+        <div class="game-card" onclick="selectWordGame('past1')">
+            <div class="card-icon">📚</div>
+            <h3>Regular Verbs 1</h3>
+            <p>Basic -ed</p>
+            <span class="card-badge easy">Easy</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past2')">
+            <div class="card-icon">📚</div>
+            <h3>Regular Verbs 2</h3>
+            <p>Basic -ed</p>
+            <span class="card-badge easy">Easy</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past3')">
+            <div class="card-icon">📚</div>
+            <h3>Regular Verbs 3</h3>
+            <p>Basic -ed</p>
+            <span class="card-badge medium">Medium</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past4')">
+            <div class="card-icon">📚</div>
+            <h3>Regular Verbs 4</h3>
+            <p>Final -e</p>
+            <span class="card-badge easy">Easy</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past5')">
+            <div class="card-icon">📚</div>
+            <h3>Regular Verbs 5</h3>
+            <p>Consonant + y</p>
+            <span class="card-badge medium">Medium</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past6')">
+            <div class="card-icon">📚</div>
+            <h3>Regular Verbs 6</h3>
+            <p>Double Consonant</p>
+            <span class="card-badge medium">Medium</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past7')">
+            <div class="card-icon">⭐</div>
+            <h3>Irregular Verbs 1</h3>
+            <p>Core Set 1</p>
+            <span class="card-badge medium">Medium</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past8')">
+            <div class="card-icon">⭐</div>
+            <h3>Irregular Verbs 2</h3>
+            <p>Core Set 2</p>
+            <span class="card-badge medium">Medium</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past9')">
+            <div class="card-icon">⭐</div>
+            <h3>Irregular Verbs 3</h3>
+            <p>Core Set 3</p>
+            <span class="card-badge hard">Hard</span>
+        </div>
+
+        <div class="game-card" onclick="selectWordGame('past10')">
+            <div class="card-icon">⭐</div>
+            <h3>Irregular Verbs 4</h3>
+            <p>Core Set 4</p>
+            <span class="card-badge hard">Hard</span>
+        </div>
     </div>
 </div>
 
