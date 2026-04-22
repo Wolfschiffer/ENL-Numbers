@@ -1457,28 +1457,27 @@ function playVerbAudio(text, context) {
 }
 
 function preloadCurrentGameAudios() {
-    verbsAudioCache.clear();
-    
     const englishTexts = currentEnglishWords.map(item => item.text);
     const portugueseTexts = currentPortugueseWords.map(item => item.text);
-    
+
     const preloadItems = [
         ...englishTexts.map(text => ({ text, context: 'english' })),
-        ...portugueseTexts.map(text => ({ 
+        ...portugueseTexts.map(text => ({
             text,
             context: currentVerbGameType === 'past' ? 'past' : 'translation'
         }))
     ];
-    
+
     preloadItems.forEach(({ text, context }) => {
         const audioPath = resolveAudioPath(text, context);
         if (audioPath) {
             ensureAudioInCache(audioPath);
         }
     });
-    
+
     console.log(`📦 Pré-carregamento concluído. Cache size: ${verbsAudioCache.size}`);
 }
+
 
 function createAudioButton(text, context, position = 'left') {
     const btn = document.createElement('button');
