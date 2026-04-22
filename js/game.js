@@ -1358,27 +1358,28 @@ function toggleAudio() {
 
 // Mapa para casos especiais de TRADUÇÃO (português)
 const TRANSLATION_AUDIO_MAP = {
-    "ser / estar": "ser_estar",
-    "contar / dizer": "contar_dizer",
-    "conseguir / obter": "conseguir_obter",
-    "fazer / criar": "fazer_criar",
-    "saber / conhecer": "saber_conhecer",
-    "pegar / levar": "pegar_levar",
-    "deixar / sair": "deixar_sair",
-    "chamar / ligar": "chamar_ligar",
-    "deixar / permitir": "deixar_permitir",
-    "conversar / falar": "conversar_falar",
-    "viver / morar": "viver_morar",
-    "ficar / permanecer": "ficar_permanecer",
-    "encontrar / conhecer": "encontrar_conhecer",
-    "definir / colocar": "definir_colocar",
-    "assistir / observar": "assistir_observar",
-    "ganhar / vencer": "ganhar_vencer",
-    "esperar / aguardar": "esperar_aguardar",
-    "levantar / aumentar": "levantar_aumentar",
-    "esperar / ter esperança": "esperar_ter_esperanca",
-    "carregar / levar": "carregar_levar"
+    "ser / estar": "ser___estar",
+    "contar / dizer": "contar___dizer",
+    "conseguir / obter": "conseguir___obter",
+    "fazer / criar": "fazer___criar",
+    "saber / conhecer": "saber___conhecer",
+    "pegar / levar": "pegar___levar",
+    "deixar / sair": "deixar___sair",
+    "chamar / ligar": "chamar___ligar",
+    "deixar / permitir": "deixar___permitir",
+    "conversar / falar": "conversar___falar",
+    "viver / morar": "viver___morar",
+    "ficar / permanecer": "ficar___permanecer",
+    "encontrar / conhecer": "encontrar___conhecer",
+    "definir / colocar": "definir___colocar",
+    "assistir / observar": "assistir___observar",
+    "ganhar / vencer": "ganhar___vencer",
+    "esperar / aguardar": "esperar___aguardar",
+    "levantar / aumentar": "levantar___aumentar",
+    "esperar / ter esperança": "esperar___ter_esperanca",
+    "carregar / levar": "carregar___levar"
 };
+
 
 // Mapa para casos especiais de PAST TENSE (inglês passado)
 const PAST_AUDIO_MAP = {
@@ -1763,17 +1764,21 @@ function handleDrop(e) {
     const englishId = parseInt(draggedElement.getAttribute('data-id'));
     const portugueseId = parseInt(targetPortuguese.getAttribute('data-id'));
     
-    if (englishId === portugueseId) {
-        lockAndMoveToTop(englishId, portugueseId);
-        showVocabMessage('✓ Correct match!', 'success');
-        renderVocabularyLists();
-        
-        if (matchesCount === currentEnglishWords.length) {
-            showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
-        }
+   if (englishId === portugueseId) {
+    lockAndMoveToTop(englishId, portugueseId);
+    showVocabMessage('✓ Correct match!', 'success');
+    renderVocabularyLists();
+
+    if (matchesCount === currentEnglishWords.length) {
+        playSound('win');
+        showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
     } else {
-        showVocabMessage('✗ Wrong match! Try again!', 'error');
+        playSound('correct');
     }
+} else {
+    playSound('wrong');
+    showVocabMessage('✗ Wrong match! Try again!', 'error');
+}
     
     if (draggedElement) draggedElement.style.opacity = '1';
     
@@ -1827,9 +1832,21 @@ function checkAndLockMatches() {
         showVocabMessage('✓ Correct match! Pair locked!', 'success');
         renderVocabularyLists();
         
-        if (matchesCount === currentEnglishWords.length) {
-            showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
-        }
+        if (englishId === portugueseId) {
+    lockAndMoveToTop(englishId, portugueseId);
+    showVocabMessage('✓ Correct match!', 'success');
+    renderVocabularyLists();
+
+    if (matchesCount === currentEnglishWords.length) {
+        playSound('win');
+        showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
+    } else {
+        playSound('correct');
+    }
+} else {
+    playSound('wrong');
+    showVocabMessage('✗ Wrong match! Try again!', 'error');
+}
     }
 }
 
@@ -2138,13 +2155,28 @@ function handleTouchEnd(e) {
     if (englishId === portugueseId) {
         // Match correto!
         lockAndMoveToTop(englishId, portugueseId);
+        playSound('correct');
         showVocabMessage('✓ Correct match!', 'success');
         renderVocabularyLists();
         
-        if (matchesCount === currentEnglishWords.length) {
-            showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
-        }
+        if (englishId === portugueseId) {
+    lockAndMoveToTop(englishId, portugueseId);
+    showVocabMessage('✓ Correct match!', 'success');
+    renderVocabularyLists();
+
+    if (matchesCount === currentEnglishWords.length) {
+        playSound('win');
+        showVocabMessage('🎉 PERFECT! You matched all verbs! 🎉', 'win');
     } else {
+        playSound('correct');
+    }
+} else {
+    playSound('wrong');
+    showVocabMessage('✗ Wrong match! Try again!', 'error');
+}
+
+    } else {
+    playSound('wrong');
         showVocabMessage('✗ Wrong match! Try again!', 'error');
     }
     
